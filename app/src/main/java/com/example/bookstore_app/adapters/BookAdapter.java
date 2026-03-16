@@ -70,6 +70,9 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
         if (!isAdmin) {
             holder.btnEditBook.setVisibility(View.GONE);
             holder.btnDeleteBook.setVisibility(View.GONE);
+        } else {
+            holder.btnBuyNow.setVisibility(View.GONE);
+            holder.btnAddToCart.setVisibility(View.GONE);
         }
 
         // Click item
@@ -112,7 +115,8 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
 
         TextView txtTitle, txtAuthor, txtPrice;
         ImageView imgBook;
-        ImageButton btnEditBook, btnDeleteBook;
+        Button btnBuyNow;
+        ImageButton btnEditBook, btnDeleteBook, btnAddToCart;
 
         public BookViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -124,11 +128,13 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
 
             btnEditBook = itemView.findViewById(R.id.btnEditBook);
             btnDeleteBook = itemView.findViewById(R.id.btnDeleteBook);
+            btnAddToCart = itemView.findViewById(R.id.btnAddToCart);
+            btnBuyNow = itemView.findViewById(R.id.btnBuyNow);
         }
     }
 
     // Update RecyclerView data
-    public void updateData(List<Book> newList){
+    public void updateData(List<Book> newList) {
 
         bookList.clear();
         bookList.addAll(newList);

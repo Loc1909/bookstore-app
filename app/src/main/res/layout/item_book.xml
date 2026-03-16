@@ -1,5 +1,4 @@
-<androidx.cardview.widget.CardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
 
     android:layout_width="match_parent"
@@ -22,43 +21,43 @@
             android:layout_width="80dp"
             android:layout_height="100dp"
             android:scaleType="centerCrop"
-            android:src="@drawable/ic_launcher_background"/>
+            android:src="@drawable/ic_launcher_background" />
 
         <!-- CONTENT -->
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="0dp"
             android:layout_height="100dp"
-            android:layout_weight="1"
-            android:layout_marginStart="10dp">
+            android:layout_marginStart="10dp"
+            android:layout_weight="1">
 
             <TextView
                 android:id="@+id/txtTitle"
-                android:textSize="18sp"
-                android:textStyle="bold"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toTopOf="parent"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"/>
+                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:id="@+id/txtAuthor"
-                android:textColor="#555"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@id/txtTitle"
-                app:layout_constraintStart_toStartOf="parent"/>
+                android:textColor="#555"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/txtTitle" />
 
             <TextView
                 android:id="@+id/txtPrice"
-                android:textStyle="bold"
-                android:textColor="#2E7D32"
-                android:layout_marginTop="4dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@id/txtAuthor"
-                app:layout_constraintStart_toStartOf="parent"/>
+                android:layout_marginTop="4dp"
+                android:textColor="#2E7D32"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/txtAuthor" />
 
             <!-- ACTION BUTTONS -->
 
@@ -70,21 +69,38 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent">
 
+                <Button
+                    android:id="@+id/btnBuyNow"
+                    android:layout_width="match_parent"
+                    android:layout_height="36dp"
+                    android:backgroundTint="@color/white"
+                    android:text="Buy Now"
+                    android:textColor="@color/black" />
+
                 <ImageButton
                     android:id="@+id/btnEditBook"
                     android:layout_width="36dp"
                     android:layout_height="36dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
-                    android:src="@android:drawable/ic_menu_edit"
-                    android:contentDescription="Edit"/>
+                    android:contentDescription="Edit"
+                    android:src="@drawable/edit_24px" />
+
+                <ImageButton
+                    android:id="@+id/btnAddToCart"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="Cart"
+                    android:src="@drawable/add_shopping_cart_24px" />
 
                 <ImageButton
                     android:id="@+id/btnDeleteBook"
                     android:layout_width="36dp"
                     android:layout_height="36dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
-                    android:src="@android:drawable/ic_menu_delete"
-                    android:contentDescription="Delete"/>
+                    android:contentDescription="Delete"
+                    android:src="@drawable/delete_24px" />
+
             </LinearLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
