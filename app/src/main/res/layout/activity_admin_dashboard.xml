@@ -1,26 +1,108 @@
-<GridLayout android:columnCount="2"
-    android:padding="16dp"
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    android:layout_height="match_parent">
 
-    <LinearLayout
-        android:id="@+id/menuBooks"
-        android:orientation="vertical"
+    <!-- Title -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Admin Dashboard"
+        android:textSize="24sp"
+        android:textStyle="bold"
         android:gravity="center"
-        android:layout_width="0dp"
-        android:layout_height="150dp"
-        android:layout_columnWeight="1">
+        android:padding="16dp"/>
 
-        <ImageView
-            android:src="@drawable/ic_book"
-            android:layout_width="50dp"
-            android:layout_height="50dp"/>
+    <!-- Menu -->
+    <GridLayout
+        android:columnCount="2"
+        android:padding="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-        <TextView
-            android:text="Quản lý sách"
-            android:textSize="16sp" android:layout_height="30dp"
-            android:layout_width="100dp"/>
-    </LinearLayout>
+        <LinearLayout
+            android:id="@+id/menuBooks"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_width="0dp"
+            android:layout_height="150dp"
+            android:layout_columnWeight="1">
 
-</GridLayout>
+            <ImageView
+                android:src="@drawable/menu_book_24px"
+                android:layout_width="50dp"
+                android:layout_height="50dp"/>
+
+            <TextView
+                android:text="Quản lý sách"
+                android:textSize="16sp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/menuCategories"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_width="0dp"
+            android:layout_height="150dp"
+            android:layout_columnWeight="1">
+
+            <ImageView
+                android:src="@drawable/label_24px"
+                android:layout_width="50dp"
+                android:layout_height="50dp"/>
+
+            <TextView
+                android:text="Quản lý danh mục"
+                android:textSize="16sp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/menuUsers"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_width="0dp"
+            android:layout_height="150dp"
+            android:layout_columnWeight="1">
+
+            <ImageView
+                android:src="@drawable/account_circle_24px"
+                android:layout_width="50dp"
+                android:layout_height="50dp"/>
+
+            <TextView
+                android:text="Quản lý người dùng"
+                android:textSize="16sp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/menuOrders"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_width="0dp"
+            android:layout_height="150dp"
+            android:layout_columnWeight="1">
+
+            <ImageView
+                android:src="@drawable/assignment_24px"
+                android:layout_width="50dp"
+                android:layout_height="50dp"/>
+
+            <TextView
+                android:text="Quản lý đơn hàng"
+                android:textSize="16sp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+    </GridLayout>
+
+</LinearLayout>

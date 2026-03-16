@@ -4,17 +4,17 @@
 
     <item
         android:id="@+id/nav_home"
-        android:icon="@android:drawable/ic_menu_view"
+        android:icon="@drawable/home_24px"
         android:title="Home"/>
 
     <item
         android:id="@+id/nav_orders"
-        android:icon="@android:drawable/ic_menu_agenda"
+        android:icon="@drawable/assignment_24px"
         android:title="Orders"/>
 
     <item
         android:id="@+id/nav_account"
-        android:icon="@android:drawable/ic_menu_myplaces"
+        android:icon="@drawable/account_circle"
         android:title="Account"/>
 
 </menu>
