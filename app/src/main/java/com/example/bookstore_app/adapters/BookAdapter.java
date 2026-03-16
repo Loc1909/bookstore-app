@@ -1,11 +1,14 @@
 package com.example.bookstore_app.adapters;
 
-import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Filter;
+import android.widget.Filterable;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -15,16 +18,22 @@ import com.bumptech.glide.Glide;
 import com.example.bookstore_app.R;
 import com.example.bookstore_app.models.Book;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder> {
+public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder> implements Filterable {
 
     private List<Book> bookList;
+    private List<Book> bookListFull;
     private OnBookActionListener listener;
+    private boolean isAdmin;
 
-    public BookAdapter(List<Book> bookList, OnBookActionListener listener) {
-        this.bookList = bookList;
+    public BookAdapter(List<Book> bookList, OnBookActionListener listener, boolean isAdmin) {
+
+        this.bookList = new ArrayList<>(bookList);
+        this.bookListFull = new ArrayList<>(bookList);
         this.listener = listener;
+        this.isAdmin = isAdmin;
     }
 
     @NonNull
@@ -44,28 +53,52 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
 
         holder.txtTitle.setText(book.getTitle());
         holder.txtAuthor.setText(book.getAuthor());
-        holder.txtPrice.setText("Price: $" + book.getPrice());
+        holder.txtPrice.setText("$" + book.getPrice());
 
-        // load ảnh nếu có
-        if(book.getImageUrl() != null && !book.getImageUrl().isEmpty()){
+        if (book.getImageUrl() != null && !book.getImageUrl().isEmpty()) {
+
             Glide.with(holder.itemView.getContext())
                     .load(book.getImageUrl())
                     .placeholder(R.drawable.ic_launcher_background)
-                    .into(holder.imgBook);        } else {
+                    .into(holder.imgBook);
+
+        } else {
+
             holder.imgBook.setImageResource(R.drawable.ic_launcher_background);
         }
 
-        // nút edit
-        holder.btnEdit.setOnClickListener(v -> {
-            if(listener != null){
-                listener.onEdit(book);
+        if (!isAdmin) {
+            holder.btnEditBook.setVisibility(View.GONE);
+            holder.btnDeleteBook.setVisibility(View.GONE);
+        }
+
+        // Click item
+        holder.itemView.setOnClickListener(v -> {
+
+            int pos = holder.getAdapterPosition();
+
+            if (listener != null && pos != RecyclerView.NO_POSITION) {
+                listener.onBookClick(bookList.get(pos));
             }
         });
 
-        // nút delete
-        holder.btnDelete.setOnClickListener(v -> {
-            if(listener != null){
-                listener.onDelete(book);
+        // Edit book
+        holder.btnEditBook.setOnClickListener(v -> {
+
+            int pos = holder.getAdapterPosition();
+
+            if (listener != null && pos != RecyclerView.NO_POSITION) {
+                listener.onEdit(bookList.get(pos));
+            }
+        });
+
+        // Delete book
+        holder.btnDeleteBook.setOnClickListener(v -> {
+
+            int pos = holder.getAdapterPosition();
+
+            if (listener != null && pos != RecyclerView.NO_POSITION) {
+                listener.onDelete(bookList.get(pos));
             }
         });
     }
@@ -75,11 +108,11 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
         return bookList.size();
     }
 
-    public static class BookViewHolder extends RecyclerView.ViewHolder {
+    static class BookViewHolder extends RecyclerView.ViewHolder {
 
         TextView txtTitle, txtAuthor, txtPrice;
-        Button btnEdit, btnDelete;
         ImageView imgBook;
+        ImageButton btnEditBook, btnDeleteBook;
 
         public BookViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -89,13 +122,77 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
             txtPrice = itemView.findViewById(R.id.txtPrice);
             imgBook = itemView.findViewById(R.id.imgBook);
 
-            btnEdit = itemView.findViewById(R.id.btnEdit);
-            btnDelete = itemView.findViewById(R.id.btnDelete);
+            btnEditBook = itemView.findViewById(R.id.btnEditBook);
+            btnDeleteBook = itemView.findViewById(R.id.btnDeleteBook);
         }
     }
 
-    public interface OnBookActionListener{
+    // Update RecyclerView data
+    public void updateData(List<Book> newList){
+
+        bookList.clear();
+        bookList.addAll(newList);
+
+        bookListFull.clear();
+        bookListFull.addAll(newList);
+
+        notifyDataSetChanged();
+    }
+
+    public interface OnBookActionListener {
+
+        void onBookClick(Book book);
+
         void onEdit(Book book);
+
         void onDelete(Book book);
     }
+
+    // SEARCH FILTER
+
+    @Override
+    public Filter getFilter() {
+        return bookFilter;
+    }
+
+    private Filter bookFilter = new Filter() {
+
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint) {
+
+            List<Book> filteredList = new ArrayList<>();
+
+            if (constraint == null || constraint.length() == 0) {
+
+                filteredList.addAll(bookListFull);
+
+            } else {
+
+                String filterPattern = constraint.toString().toLowerCase().trim();
+
+                for (Book book : bookListFull) {
+
+                    if (book.getTitle().toLowerCase().contains(filterPattern)
+                            || book.getAuthor().toLowerCase().contains(filterPattern)) {
+
+                        filteredList.add(book);
+                    }
+                }
+            }
+
+            FilterResults results = new FilterResults();
+            results.values = filteredList;
+
+            return results;
+        }
+
+        @Override
+        protected void publishResults(CharSequence constraint, FilterResults results) {
+
+            bookList.clear();
+            bookList.addAll((List<Book>) results.values);
+
+            notifyDataSetChanged();
+        }
+    };
 }

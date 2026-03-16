@@ -7,33 +7,73 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "bookstore.db";
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 4;
 
+    // TABLE NAMES
     public static final String TABLE_BOOK = "books";
+    public static final String TABLE_CATEGORY = "categories";
+
+    // BOOK COLUMNS
+    public static final String COL_BOOK_ID = "id";
+    public static final String COL_TITLE = "title";
+    public static final String COL_AUTHOR = "author";
+    public static final String COL_PRICE = "price";
+    public static final String COL_IMAGE = "imageUrl";
+    public static final String COL_CATEGORY_ID = "category_id";
+    public static final String COL_DESCRIPTION = "description";
+    public static final String COL_STOCK = "stock";
+
+    // CATEGORY COLUMNS
+    public static final String COL_CATEGORY_NAME = "name";
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
+    private void insertDefaultCategories(SQLiteDatabase db){
+
+        db.execSQL("INSERT OR IGNORE INTO " + TABLE_CATEGORY + "(name) VALUES ('Programming')");
+        db.execSQL("INSERT OR IGNORE INTO " + TABLE_CATEGORY + "(name) VALUES ('Novel')");
+        db.execSQL("INSERT OR IGNORE INTO " + TABLE_CATEGORY + "(name) VALUES ('Science')");
+        db.execSQL("INSERT OR IGNORE INTO " + TABLE_CATEGORY + "(name) VALUES ('Business')");
+    }
+
     @Override
     public void onCreate(SQLiteDatabase db) {
 
-        String CREATE_TABLE = "CREATE TABLE books (" +
-                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                "title TEXT," +
-                "author TEXT," +
-                "price REAL," +
-                "imageUrl TEXT" +
-                ")";
+        String CREATE_CATEGORY_TABLE =
+                "CREATE TABLE " + TABLE_CATEGORY + " (" +
+                        "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                        "name TEXT UNIQUE)";
 
-        db.execSQL(CREATE_TABLE);
+        db.execSQL(CREATE_CATEGORY_TABLE);
+
+        // Insert default categories
+        insertDefaultCategories(db);
+
+        String CREATE_BOOK_TABLE =
+                "CREATE TABLE " + TABLE_BOOK + " (" +
+                        COL_BOOK_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+                        COL_TITLE + " TEXT," +
+                        COL_AUTHOR + " TEXT," +
+                        COL_PRICE + " REAL," +
+                        COL_IMAGE + " TEXT," +
+                        COL_CATEGORY_ID + " INTEGER," +
+                        COL_DESCRIPTION + " TEXT," +
+                        COL_STOCK + " INTEGER," +
+                        "FOREIGN KEY(" + COL_CATEGORY_ID + ") REFERENCES "
+                        + TABLE_CATEGORY + "(id)" +
+                        ")";
+
+        db.execSQL(CREATE_BOOK_TABLE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
-        db.execSQL("DROP TABLE IF EXISTS books");
-        onCreate(db);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_BOOK);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CATEGORY);
 
+        onCreate(db);
     }
 }

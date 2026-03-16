@@ -13,8 +13,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Bookstoreapp">
 
+        <!-- Main screen -->
         <activity
-            android:name=".activities.MainActivity"
+            android:name=".activities.AdminDashboardActivity"
             android:exported="true">
 
             <intent-filter>
@@ -23,10 +24,24 @@
             </intent-filter>
 
         </activity>
+
+        <!-- Admin dashboard -->
+        <activity
+            android:name=".activities.MainActivity"
+            android:exported="false"/>
+
+        <!-- Book management -->
         <activity
             android:name=".activities.AddBookActivity"
             android:exported="false"/>
-        <activity android:name=".activities.EditBookActivity"/>
+
+        <activity
+            android:name=".activities.EditBookActivity"
+            android:exported="false"/>
+        <activity
+            android:name=".activities.AdminBookActivity"
+            android:exported="false"/>
+
 
     </application>
 

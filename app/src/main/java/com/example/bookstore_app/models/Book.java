@@ -5,7 +5,7 @@ public class Book {
     private int id;
     private String title;
     private String author;
-    private String category;
+    private int categoryId;
     private double price;
     private String description;
     private String imageUrl;
@@ -16,12 +16,12 @@ public class Book {
     }
 
     // Constructor đầy đủ
-    public Book(int id, String title, String author, String category,
+    public Book(int id, String title, String author, int categoryId,
                 double price, String description, String imageUrl, int stock) {
         this.id = id;
         this.title = title;
         this.author = author;
-        this.category = category;
+        this.categoryId = categoryId;
         this.price = price;
         this.description = description;
         this.imageUrl = imageUrl;
@@ -65,12 +65,12 @@ public class Book {
         this.author = author;
     }
 
-    public String getCategory() {
-        return category;
+    public int getCategoryId() {
+        return categoryId;
     }
 
-    public void setCategory(String category) {
-        this.category = category;
+    public void setCategoryId(int categoryId) {
+        this.categoryId = categoryId;
     }
 
     public double getPrice() {
@@ -111,7 +111,7 @@ public class Book {
                 "id=" + id +
                 ", title='" + title + '\'' +
                 ", author='" + author + '\'' +
-                ", category='" + category + '\'' +
+                ", category='" + categoryId + '\'' +
                 ", price=" + price +
                 ", stock=" + stock +
                 '}';

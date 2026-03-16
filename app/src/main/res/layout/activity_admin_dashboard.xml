@@ -1,0 +1,26 @@
+<GridLayout android:columnCount="2"
+    android:padding="16dp"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <LinearLayout
+        android:id="@+id/menuBooks"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:layout_width="0dp"
+        android:layout_height="150dp"
+        android:layout_columnWeight="1">
+
+        <ImageView
+            android:src="@drawable/ic_book"
+            android:layout_width="50dp"
+            android:layout_height="50dp"/>
+
+        <TextView
+            android:text="Quản lý sách"
+            android:textSize="16sp" android:layout_height="30dp"
+            android:layout_width="100dp"/>
+    </LinearLayout>
+
+</GridLayout>
