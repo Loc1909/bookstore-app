@@ -37,10 +37,13 @@
             android:name=".activities.EditBookActivity"
             android:exported="false"/>
         <activity
-            android:name=".activities.AdminBookActivity"
+            android:name=".activities.AdminUserActivity"
             android:exported="false"/>
-
-
+        
+        <activity
+            android:name=".activities.AdminCategoryActivity"
+            android:exported="false"/>
+            
     </application>
 
 </manifest>
