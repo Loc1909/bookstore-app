@@ -11,6 +11,7 @@ import com.example.bookstore_app.R;
 public class AdminDashboardActivity extends AppCompatActivity {
 
     LinearLayout menuBooks;
+    LinearLayout menuStats;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -18,11 +19,16 @@ public class AdminDashboardActivity extends AppCompatActivity {
         setContentView(R.layout.activity_admin_dashboard);
 
         menuBooks = findViewById(R.id.menuBooks);
+        menuStats = findViewById(R.id.menuStats);
 
         menuBooks.setOnClickListener(v -> {
 
             startActivity(new Intent(this, AdminBookActivity.class));
 
         });
+
+        menuStats.setOnClickListener(v ->
+                startActivity(new Intent(this, StatsActivity.class))
+        );
     }
 }

@@ -103,6 +103,26 @@
                 android:layout_height="wrap_content"/>
         </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/menuStats"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_width="0dp"
+            android:layout_height="150dp"
+            android:layout_columnWeight="1">
+
+            <ImageView
+                android:src="@drawable/equalizer_24px"
+                android:layout_width="50dp"
+                android:layout_height="50dp"/>
+
+            <TextView
+                android:text="Thống kê"
+                android:textSize="16sp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+
     </GridLayout>
 
 </LinearLayout>

@@ -7,72 +7,99 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "bookstore.db";
-    private static final int DATABASE_VERSION = 4;
+    private static final int DATABASE_VERSION = 6;
 
-    // TABLE NAMES
+    // TABLES
     public static final String TABLE_BOOK = "books";
     public static final String TABLE_CATEGORY = "categories";
-
-    // BOOK COLUMNS
-    public static final String COL_BOOK_ID = "id";
-    public static final String COL_TITLE = "title";
-    public static final String COL_AUTHOR = "author";
-    public static final String COL_PRICE = "price";
-    public static final String COL_IMAGE = "imageUrl";
-    public static final String COL_CATEGORY_ID = "category_id";
-    public static final String COL_DESCRIPTION = "description";
-    public static final String COL_STOCK = "stock";
-
-    // CATEGORY COLUMNS
-    public static final String COL_CATEGORY_NAME = "name";
+    public static final String TABLE_USER = "users";
+    public static final String TABLE_ORDER = "orders";
+    public static final String TABLE_ORDER_ITEM = "order_items";
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
-    private void insertDefaultCategories(SQLiteDatabase db){
-
-        db.execSQL("INSERT OR IGNORE INTO " + TABLE_CATEGORY + "(name) VALUES ('Programming')");
-        db.execSQL("INSERT OR IGNORE INTO " + TABLE_CATEGORY + "(name) VALUES ('Novel')");
-        db.execSQL("INSERT OR IGNORE INTO " + TABLE_CATEGORY + "(name) VALUES ('Science')");
-        db.execSQL("INSERT OR IGNORE INTO " + TABLE_CATEGORY + "(name) VALUES ('Business')");
-    }
-
     @Override
     public void onCreate(SQLiteDatabase db) {
 
-        String CREATE_CATEGORY_TABLE =
-                "CREATE TABLE " + TABLE_CATEGORY + " (" +
-                        "id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                        "name TEXT UNIQUE)";
+        // ================= CATEGORY =================
+        db.execSQL("CREATE TABLE " + TABLE_CATEGORY + " (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "name TEXT UNIQUE)");
 
-        db.execSQL(CREATE_CATEGORY_TABLE);
+        // ================= BOOK =================
+        db.execSQL("CREATE TABLE " + TABLE_BOOK + " (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "title TEXT," +
+                "author TEXT," +
+                "price REAL," +
+                "imageUrl TEXT," +
+                "category_id INTEGER," +
+                "description TEXT," +
+                "stock INTEGER," +
+                "FOREIGN KEY(category_id) REFERENCES categories(id))");
 
-        // Insert default categories
-        insertDefaultCategories(db);
+        // ================= USER =================
+        db.execSQL("CREATE TABLE " + TABLE_USER + " (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "username TEXT," +
+                "email TEXT)");
 
-        String CREATE_BOOK_TABLE =
-                "CREATE TABLE " + TABLE_BOOK + " (" +
-                        COL_BOOK_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
-                        COL_TITLE + " TEXT," +
-                        COL_AUTHOR + " TEXT," +
-                        COL_PRICE + " REAL," +
-                        COL_IMAGE + " TEXT," +
-                        COL_CATEGORY_ID + " INTEGER," +
-                        COL_DESCRIPTION + " TEXT," +
-                        COL_STOCK + " INTEGER," +
-                        "FOREIGN KEY(" + COL_CATEGORY_ID + ") REFERENCES "
-                        + TABLE_CATEGORY + "(id)" +
-                        ")";
+        // ================= ORDER =================
+        db.execSQL("CREATE TABLE " + TABLE_ORDER + " (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "user_id INTEGER," +
+                "order_date TEXT," +
+                "FOREIGN KEY(user_id) REFERENCES users(id))");
 
-        db.execSQL(CREATE_BOOK_TABLE);
+        // ================= ORDER ITEM =================
+        db.execSQL("CREATE TABLE " + TABLE_ORDER_ITEM + " (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "order_id INTEGER," +
+                "book_id INTEGER," +
+                "quantity INTEGER," +
+                "price REAL," +
+                "FOREIGN KEY(order_id) REFERENCES orders(id)," +
+                "FOREIGN KEY(book_id) REFERENCES books(id))");
+
+        insertSampleData(db);
+    }
+
+    private void insertSampleData(SQLiteDatabase db) {
+
+        // Categories
+        db.execSQL("INSERT INTO categories(name) VALUES ('Programming')");
+        db.execSQL("INSERT INTO categories(name) VALUES ('Novel')");
+        db.execSQL("INSERT INTO categories(name) VALUES ('Science')");
+
+        // Books
+        db.execSQL("INSERT INTO books(title,author,price,category_id,stock) VALUES ('Java Basics','John',100,1,10)");
+        db.execSQL("INSERT INTO books(title,author,price,category_id,stock) VALUES ('Android Dev','Mike',150,1,8)");
+        db.execSQL("INSERT INTO books(title,author,price,category_id,stock) VALUES ('Love Story','Anna',80,2,5)");
+
+        // Users
+        db.execSQL("INSERT INTO users(username,email) VALUES ('kien','kien@gmail.com')");
+        db.execSQL("INSERT INTO users(username,email) VALUES ('an','an@gmail.com')");
+
+        // Orders
+        db.execSQL("INSERT INTO orders(user_id,order_date) VALUES (1,'2026-03-01')");
+        db.execSQL("INSERT INTO orders(user_id,order_date) VALUES (2,'2026-03-02')");
+
+        // Order Items
+        db.execSQL("INSERT INTO order_items(order_id,book_id,quantity,price) VALUES (1,1,2,100)");
+        db.execSQL("INSERT INTO order_items(order_id,book_id,quantity,price) VALUES (1,2,1,150)");
+        db.execSQL("INSERT INTO order_items(order_id,book_id,quantity,price) VALUES (2,3,3,80)");
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_BOOK);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CATEGORY);
+        db.execSQL("DROP TABLE IF EXISTS order_items");
+        db.execSQL("DROP TABLE IF EXISTS orders");
+        db.execSQL("DROP TABLE IF EXISTS users");
+        db.execSQL("DROP TABLE IF EXISTS books");
+        db.execSQL("DROP TABLE IF EXISTS categories");
 
         onCreate(db);
     }
