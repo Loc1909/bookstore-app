@@ -40,9 +40,9 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
     public void onBindViewHolder(@NonNull UserViewHolder holder, int position) {
         User user = userList.get(position);
         
-        holder.tvUserFullname.setText(user.getFullname() != null ? user.getFullname() : "N/A");
-        String usernameRole = user.getUsername() + " • " + user.getRole();
-        holder.tvUsernameRole.setText(usernameRole);
+        holder.tvUserFullname.setText(user.getFullName() != null ? user.getFullName() : "N/A");
+        String emailRole = user.getEmail() + " • " + user.getRole();
+        holder.tvEmailRole.setText(emailRole);
 
         holder.btnEdit.setOnClickListener(v -> {
             if (listener != null) listener.onEditClick(user);
@@ -58,14 +58,20 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
         return userList != null ? userList.size() : 0;
     }
 
+    public void updateList(List<User> newList) {
+        userList.clear();
+        userList.addAll(newList);
+        notifyDataSetChanged();
+    }
+
     static class UserViewHolder extends RecyclerView.ViewHolder {
-        TextView tvUserFullname, tvUsernameRole;
+        TextView tvUserFullname, tvEmailRole;
         ImageButton btnEdit, btnDelete;
 
         public UserViewHolder(@NonNull View itemView) {
             super(itemView);
             tvUserFullname = itemView.findViewById(R.id.tvUserFullname);
-            tvUsernameRole = itemView.findViewById(R.id.tvUsernameRole);
+            tvEmailRole = itemView.findViewById(R.id.tvEmailRole);
             btnEdit = itemView.findViewById(R.id.btnEditUser);
             btnDelete = itemView.findViewById(R.id.btnDeleteUser);
         }
