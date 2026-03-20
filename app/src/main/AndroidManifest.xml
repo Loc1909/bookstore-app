@@ -15,7 +15,8 @@
 
         <!-- Main screen -->
         <activity
-            android:name=".activities.MainActivity"
+            android:name=".activities.AdminDashboardActivity"
+
             android:exported="true">
 
             <intent-filter>
@@ -27,7 +28,7 @@
 
         <!-- Admin dashboard -->
         <activity
-            android:name=".activities.AdminDashboardActivity"
+            android:name=".activities.MainActivity"
             android:exported="false" /> <!-- Book management -->
         <activity
             android:name=".activities.AddBookActivity"
