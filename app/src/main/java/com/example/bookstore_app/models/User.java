@@ -5,20 +5,18 @@ public class User {
     private int id;
     private String username;
     private String email;
-    private String password; // Trong thực tế nên hash, nhưng demo thì để plain
+    private String password;
     private String fullName;
     private String phone;
     private String address;
-    private String role; // "admin" hoặc "user"
+    private String role;
     private String avatar;
     private long createdAt;
 
-    // Constructor rỗng (bắt buộc cho SQLite)
-    public User() {
-    }
+    // Constructor rỗng
     public User() {}
 
-    // Constructor cho đăng ký
+    // Constructor đăng ký
     public User(String email, String password, String fullName, String role) {
         this.email = email;
         this.password = password;
@@ -28,9 +26,9 @@ public class User {
     }
 
     // Constructor đầy đủ
-    public User(int id, String email, String password, String fullName,
-                String phone, String address, String role, String avatar, long createdAt) {
-    public User(int id, String username, String email) {
+    public User(int id, String username, String email, String password,
+                String fullName, String phone, String address,
+                String role, String avatar, long createdAt) {
         this.id = id;
         this.username = username;
         this.email = email;
@@ -43,82 +41,36 @@ public class User {
         this.createdAt = createdAt;
     }
 
-    // GETTERS và SETTERS
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
+    // Getter & Setter
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 
-    public String getFullName() {
-        return fullName;
-    }
     public String getUsername() { return username; }
     public void setUsername(String username) { this.username = username; }
 
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
 
-    public String getPhone() {
-        return phone;
-    }
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
 
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
+    public String getFullName() { return fullName; }
+    public void setFullName(String fullName) { this.fullName = fullName; }
 
-    public String getAddress() {
-        return address;
-    }
+    public String getPhone() { return phone; }
+    public void setPhone(String phone) { this.phone = phone; }
 
-    public void setAddress(String address) {
-        this.address = address;
-    }
+    public String getAddress() { return address; }
+    public void setAddress(String address) { this.address = address; }
 
-    public String getRole() {
-        return role;
-    }
+    public String getRole() { return role; }
+    public void setRole(String role) { this.role = role; }
 
-    public void setRole(String role) {
-        this.role = role;
-    }
+    public String getAvatar() { return avatar; }
+    public void setAvatar(String avatar) { this.avatar = avatar; }
 
-    public String getAvatar() {
-        return avatar;
-    }
-
-    public void setAvatar(String avatar) {
-        this.avatar = avatar;
-    }
-
-    public long getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(long createdAt) {
-        this.createdAt = createdAt;
-    }
+    public long getCreatedAt() { return createdAt; }
+    public void setCreatedAt(long createdAt) { this.createdAt = createdAt; }
 
     @Override
     public String toString() {
@@ -129,6 +81,4 @@ public class User {
                 ", role='" + role + '\'' +
                 '}';
     }
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
 }

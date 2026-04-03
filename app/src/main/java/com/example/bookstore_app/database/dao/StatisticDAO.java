@@ -29,17 +29,15 @@ public class StatisticDAO {
                 "SUM(oi.quantity * oi.price) as revenue " +
                 "FROM orders o " +
                 "JOIN order_items oi ON o.id = oi.order_id " +
-                "GROUP BY month ORDER BY month DESC";
+                "GROUP BY month ORDER BY month ASC";
 
         Cursor cursor = db.rawQuery(sql, null);
-
         while (cursor.moveToNext()) {
             list.add(new RevenueStat(
                     cursor.getString(0),
                     cursor.getDouble(1)
             ));
         }
-
         cursor.close();
         return list;
     }
@@ -48,43 +46,39 @@ public class StatisticDAO {
     public List<TopProduct> getTopProducts() {
         List<TopProduct> list = new ArrayList<>();
 
-        String sql = "SELECT b.title, SUM(oi.quantity) as total " +   //
+        String sql = "SELECT b.title, SUM(oi.quantity) as total " +
                 "FROM order_items oi " +
                 "JOIN books b ON oi.book_id = b.id " +
                 "GROUP BY b.id ORDER BY total DESC LIMIT 5";
 
         Cursor cursor = db.rawQuery(sql, null);
-
         while (cursor.moveToNext()) {
             list.add(new TopProduct(
                     cursor.getString(0),
                     cursor.getInt(1)
             ));
         }
-
         cursor.close();
         return list;
     }
 
-    // 3. Thống kê user
+    // 3. Thống kê user chi tiêu
     public List<UserStat> getUserStats() {
         List<UserStat> list = new ArrayList<>();
 
-        String sql = "SELECT u.username, SUM(oi.quantity * oi.price) " +
+        String sql = "SELECT u.fullName, SUM(oi.quantity * oi.price) " +
                 "FROM orders o " +
                 "JOIN users u ON o.user_id = u.id " +
                 "JOIN order_items oi ON oi.order_id = o.id " +
-                "GROUP BY u.id ORDER BY 2 DESC";
+                "GROUP BY u.id ORDER BY 2 DESC LIMIT 5";
 
         Cursor cursor = db.rawQuery(sql, null);
-
         while (cursor.moveToNext()) {
             list.add(new UserStat(
                     cursor.getString(0),
                     cursor.getDouble(1)
             ));
         }
-
         cursor.close();
         return list;
     }
@@ -100,29 +94,48 @@ public class StatisticDAO {
                 "GROUP BY c.id ORDER BY 2 DESC";
 
         Cursor cursor = db.rawQuery(sql, null);
-
         while (cursor.moveToNext()) {
             list.add(new CategoryStat(
                     cursor.getString(0),
                     cursor.getInt(1)
             ));
         }
-
         cursor.close();
         return list;
     }
 
-
+    // 5. Tổng doanh thu
     public double getTotalRevenue() {
         double total = 0;
-
         String sql = "SELECT SUM(quantity * price) FROM order_items";
         Cursor cursor = db.rawQuery(sql, null);
-
         if (cursor.moveToFirst()) {
             total = cursor.getDouble(0);
         }
+        cursor.close();
+        return total;
+    }
 
+    // 6. Tổng số đơn hàng
+    public int getTotalOrders() {
+        int total = 0;
+        String sql = "SELECT COUNT(*) FROM orders";
+        Cursor cursor = db.rawQuery(sql, null);
+        if (cursor.moveToFirst()) {
+            total = cursor.getInt(0);
+        }
+        cursor.close();
+        return total;
+    }
+
+    // 7. Số khách hàng đã mua (có ít nhất 1 đơn)
+    public int getTotalCustomers() {
+        int total = 0;
+        String sql = "SELECT COUNT(DISTINCT user_id) FROM orders";
+        Cursor cursor = db.rawQuery(sql, null);
+        if (cursor.moveToFirst()) {
+            total = cursor.getInt(0);
+        }
         cursor.close();
         return total;
     }

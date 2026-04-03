@@ -2,9 +2,7 @@ package com.example.bookstore_app.fragments;
 
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -12,7 +10,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 
 import com.example.bookstore_app.R;
 import com.example.bookstore_app.database.dao.UserDAO;
@@ -35,9 +32,6 @@ public class RegisterFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        // Khởi tạo views
         edtFullName = view.findViewById(R.id.edtFullName);
         edtEmail = view.findViewById(R.id.edtEmail);
         edtPhone = view.findViewById(R.id.edtPhone);
@@ -48,16 +42,13 @@ public class RegisterFragment extends Fragment {
         progressBar = view.findViewById(R.id.progressBar);
         txtLogin = view.findViewById(R.id.txtLogin);
 
-        // Khởi tạo DAO
         userDAO = new UserDAO(requireContext());
 
-        // Xử lý sự kiện
         btnRegister.setOnClickListener(v -> attemptRegister());
         txtLogin.setOnClickListener(v -> navigateToLogin());
     }
 
     private void attemptRegister() {
-        // Lấy dữ liệu
         String fullName = edtFullName.getText().toString().trim();
         String email = edtEmail.getText().toString().trim();
         String phone = edtPhone.getText().toString().trim();
@@ -65,88 +56,78 @@ public class RegisterFragment extends Fragment {
         String password = edtPassword.getText().toString().trim();
         String confirmPassword = edtConfirmPassword.getText().toString().trim();
 
-        // Validate
         if (TextUtils.isEmpty(fullName)) {
             edtFullName.setError("Full name is required");
-            edtFullName.requestFocus();
             return;
         }
 
         if (TextUtils.isEmpty(email)) {
             edtEmail.setError("Email is required");
-            edtEmail.requestFocus();
             return;
         }
 
         if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            edtEmail.setError("Invalid email format");
-            edtEmail.requestFocus();
+            edtEmail.setError("Invalid email");
             return;
         }
 
         if (TextUtils.isEmpty(password)) {
             edtPassword.setError("Password is required");
-            edtPassword.requestFocus();
             return;
         }
 
         if (password.length() < 6) {
-            edtPassword.setError("Password must be at least 6 characters");
-            edtPassword.requestFocus();
+            edtPassword.setError("Min 6 chars");
             return;
         }
 
         if (!password.equals(confirmPassword)) {
-            edtConfirmPassword.setError("Passwords do not match");
-            edtConfirmPassword.requestFocus();
+            edtConfirmPassword.setError("Not match");
             return;
         }
 
-        // Show progress
         showProgress(true);
-
-        // Kiểm tra email đã tồn tại chưa
-        new Thread(() -> {
-            boolean emailExists = userDAO.isEmailExists(email);
-
-            requireActivity().runOnUiThread(() -> {
-                if (emailExists) {
-                    showProgress(false);
-                    edtEmail.setError("Email already exists");
-                    edtEmail.requestFocus();
-                } else {
-                    // Tiến hành đăng ký
-                    registerUser(fullName, email, phone, address, password);
-                }
-            });
-        }).start();
+        registerUser(fullName, email, phone, address, password);
     }
 
     private void registerUser(String fullName, String email, String phone, String address, String password) {
-        // Tạo user mới
+
         User newUser = new User();
         newUser.setFullName(fullName);
         newUser.setEmail(email);
-        newUser.setPassword(password); // Trong thực tế nên hash
+        newUser.setPassword(password);
         newUser.setPhone(phone);
         newUser.setAddress(address);
-        newUser.setRole("user"); // Mặc định là user thường
+        newUser.setRole("user");
 
-        // Lưu vào database
         new Thread(() -> {
-            boolean success = userDAO.register(newUser);
+            boolean success = false;
 
-            requireActivity().runOnUiThread(() -> {
-                showProgress(false);
+            try {
+                success = userDAO.register(newUser);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
-                if (success) {
-                    Toast.makeText(requireContext(), "Registration successful! Please login.", Toast.LENGTH_LONG).show();
-                    // Quay lại màn hình login
-                    navigateToLogin();
-                } else {
-                    Toast.makeText(requireContext(), "Registration failed. Please try again.", Toast.LENGTH_LONG).show();
-                }
-            });
+            boolean finalSuccess = success;
+
+            // FIX crash lifecycle
+            if (isAdded()) {
+                requireActivity().runOnUiThread(() -> {
+                    showProgress(false);
+
+                    if (finalSuccess) {
+                        Toast.makeText(requireContext(),
+                                "Registration successful! Please login.",
+                                Toast.LENGTH_LONG).show();
+                        navigateToLogin();
+                    } else {
+                        Toast.makeText(requireContext(),
+                                "Registration failed!",
+                                Toast.LENGTH_LONG).show();
+                    }
+                });
+            }
         }).start();
     }
 
@@ -157,6 +138,7 @@ public class RegisterFragment extends Fragment {
     private void showProgress(boolean show) {
         progressBar.setVisibility(show ? View.VISIBLE : View.GONE);
         btnRegister.setEnabled(!show);
+
         edtFullName.setEnabled(!show);
         edtEmail.setEnabled(!show);
         edtPhone.setEnabled(!show);

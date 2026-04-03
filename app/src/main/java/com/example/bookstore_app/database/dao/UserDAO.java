@@ -27,9 +27,15 @@ public class UserDAO {
     public boolean register(User user) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
+        // check email tồn tại trước (tránh rely vào UNIQUE exception)
+        if (isEmailExists(user.getEmail())) {
+            db.close();
+            return false;
+        }
+
         ContentValues values = new ContentValues();
         values.put(DatabaseHelper.COL_EMAIL, user.getEmail());
-        values.put(DatabaseHelper.COL_PASSWORD, user.getPassword()); // Trong thực tế nên hash
+        values.put(DatabaseHelper.COL_PASSWORD, user.getPassword());
         values.put(DatabaseHelper.COL_FULL_NAME, user.getFullName());
         values.put(DatabaseHelper.COL_PHONE, user.getPhone());
         values.put(DatabaseHelper.COL_ADDRESS, user.getAddress());
@@ -40,7 +46,7 @@ public class UserDAO {
         long result = db.insert(DatabaseHelper.TABLE_USER, null, values);
         db.close();
 
-        return result != -1; // -1 là insert thất bại (thường do email trùng)
+        return result != -1;
     }
 
     /**
