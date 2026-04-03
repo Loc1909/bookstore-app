@@ -13,6 +13,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String TABLE_BOOK = "books";
     public static final String TABLE_CATEGORY = "categories";
     public static final String TABLE_USER = "users";
+    public static final String TABLE_CART = "cart";
 
     // BOOK COLUMNS
     public static final String COL_BOOK_ID = "id";
@@ -23,6 +24,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COL_CATEGORY_ID = "category_id";
     public static final String COL_DESCRIPTION = "description";
     public static final String COL_STOCK = "stock";
+    public static final String COL_CART_ID = "id";
+    public static final String COL_CART_BOOK_ID = "bookId";
+    public static final String COL_CART_TITLE = "title";
+    public static final String COL_CART_PRICE = "price";
+    public static final String COL_CART_QUANTITY = "quantity";
 
     // CATEGORY COLUMNS
     public static final String COL_CATEGORY_NAME = "name";
@@ -151,6 +157,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         insertDefaultAdmin(db);
         // Insert user mẫu
         insertDefaultUsers(db);
+
+        // Tạo bảng Cart
+        String CREATE_CART_TABLE =
+                "CREATE TABLE " + TABLE_CART + " (" +
+                        COL_CART_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                        COL_CART_BOOK_ID + " INTEGER, " +
+                        COL_CART_TITLE + " TEXT, " +
+                        COL_CART_PRICE + " REAL, " +
+                        COL_CART_QUANTITY + " INTEGER)";
+
+        db.execSQL(CREATE_CART_TABLE);
     }
 
     @Override

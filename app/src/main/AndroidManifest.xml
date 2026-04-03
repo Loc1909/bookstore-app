@@ -45,7 +45,10 @@
         <activity
             android:name=".activities.AdminCategoryActivity"
             android:exported="false"/>
-            
+
+        <activity
+            android:name=".activities.CartActivity"
+            android:exported="false" />
     </application>
 
 </manifest>
