@@ -19,15 +19,10 @@ public class UserDAO {
         dbHelper = new DatabaseHelper(context);
     }
 
-    /**
-     * Đăng ký tài khoản mới
-     * @param user Đối tượng User cần đăng ký
-     * @return true nếu đăng ký thành công, false nếu email đã tồn tại
-     */
+    // ================= REGISTER =================
     public boolean register(User user) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
-        // check email tồn tại trước (tránh rely vào UNIQUE exception)
         if (isEmailExists(user.getEmail())) {
             db.close();
             return false;
@@ -35,7 +30,7 @@ public class UserDAO {
 
         ContentValues values = new ContentValues();
         values.put(DatabaseHelper.COL_EMAIL, user.getEmail());
-        values.put(DatabaseHelper.COL_PASSWORD, user.getPassword());
+        values.put(DatabaseHelper.COL_PASSWORD, user.getPassword()); // nên hash sau
         values.put(DatabaseHelper.COL_FULL_NAME, user.getFullName());
         values.put(DatabaseHelper.COL_PHONE, user.getPhone());
         values.put(DatabaseHelper.COL_ADDRESS, user.getAddress());
@@ -49,166 +44,153 @@ public class UserDAO {
         return result != -1;
     }
 
-    /**
-     * Đăng nhập
-     * @param email Email đăng nhập
-     * @param password Mật khẩu
-     * @return User object nếu đăng nhập thành công, null nếu thất bại
-     */
+    // ================= LOGIN =================
     public User login(String email, String password) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
-        String query = "SELECT * FROM " + DatabaseHelper.TABLE_USER +
-                " WHERE " + DatabaseHelper.COL_EMAIL + " = ? AND " +
-                DatabaseHelper.COL_PASSWORD + " = ?";
-
-        Cursor cursor = db.rawQuery(query, new String[]{email, password});
+        Cursor cursor = db.rawQuery(
+                "SELECT * FROM " + DatabaseHelper.TABLE_USER +
+                        " WHERE " + DatabaseHelper.COL_EMAIL + "=? AND " +
+                        DatabaseHelper.COL_PASSWORD + "=?",
+                new String[]{email, password}
+        );
 
         User user = null;
 
-        if (cursor.moveToFirst()) {
+        if (cursor != null && cursor.moveToFirst()) {
             user = cursorToUser(cursor);
+            cursor.close();
         }
 
-        cursor.close();
         db.close();
-
         return user;
     }
 
-    /**
-     * Lấy user theo ID
-     */
+    // ================= GET BY ID =================
     public User getUserById(int id) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
-        String query = "SELECT * FROM " + DatabaseHelper.TABLE_USER +
-                " WHERE " + DatabaseHelper.COL_USER_ID + " = ?";
-
-        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(id)});
+        Cursor cursor = db.rawQuery(
+                "SELECT * FROM " + DatabaseHelper.TABLE_USER +
+                        " WHERE " + DatabaseHelper.COL_USER_ID + "=?",
+                new String[]{String.valueOf(id)}
+        );
 
         User user = null;
 
-        if (cursor.moveToFirst()) {
+        if (cursor != null && cursor.moveToFirst()) {
             user = cursorToUser(cursor);
+            cursor.close();
         }
 
-        cursor.close();
         db.close();
-
         return user;
     }
 
-    /**
-     * Lấy user theo email
-     */
+    // ================= GET BY EMAIL =================
     public User getUserByEmail(String email) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
-        String query = "SELECT * FROM " + DatabaseHelper.TABLE_USER +
-                " WHERE " + DatabaseHelper.COL_EMAIL + " = ?";
-
-        Cursor cursor = db.rawQuery(query, new String[]{email});
+        Cursor cursor = db.rawQuery(
+                "SELECT * FROM " + DatabaseHelper.TABLE_USER +
+                        " WHERE " + DatabaseHelper.COL_EMAIL + "=?",
+                new String[]{email}
+        );
 
         User user = null;
 
-        if (cursor.moveToFirst()) {
+        if (cursor != null && cursor.moveToFirst()) {
             user = cursorToUser(cursor);
+            cursor.close();
         }
 
-        cursor.close();
         db.close();
-
         return user;
     }
 
-    /**
-     * Kiểm tra email đã tồn tại chưa
-     */
+    // ================= CHECK EMAIL =================
     public boolean isEmailExists(String email) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
-        String query = "SELECT COUNT(*) FROM " + DatabaseHelper.TABLE_USER +
-                " WHERE " + DatabaseHelper.COL_EMAIL + " = ?";
+        Cursor cursor = db.rawQuery(
+                "SELECT 1 FROM " + DatabaseHelper.TABLE_USER +
+                        " WHERE " + DatabaseHelper.COL_EMAIL + "=? LIMIT 1",
+                new String[]{email}
+        );
 
-        Cursor cursor = db.rawQuery(query, new String[]{email});
+        boolean exists = cursor != null && cursor.moveToFirst();
 
-        int count = 0;
-        if (cursor.moveToFirst()) {
-            count = cursor.getInt(0);
-        }
-
-        cursor.close();
+        if (cursor != null) cursor.close();
         db.close();
 
-        return count > 0;
+        return exists;
     }
 
-    /**
-     * Lấy tất cả users (cho admin)
-     */
+    // ================= GET ALL =================
     public List<User> getAllUsers() {
-        List<User> userList = new ArrayList<>();
+        List<User> list = new ArrayList<>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
-        String query = "SELECT * FROM " + DatabaseHelper.TABLE_USER +
-                " ORDER BY " + DatabaseHelper.COL_CREATED_AT + " DESC";
+        Cursor cursor = db.rawQuery(
+                "SELECT * FROM " + DatabaseHelper.TABLE_USER +
+                        " ORDER BY " + DatabaseHelper.COL_CREATED_AT + " DESC",
+                null
+        );
 
-        Cursor cursor = db.rawQuery(query, null);
-
-        if (cursor.moveToFirst()) {
+        if (cursor != null && cursor.moveToFirst()) {
             do {
-                userList.add(cursorToUser(cursor));
+                list.add(cursorToUser(cursor));
             } while (cursor.moveToNext());
+
+            cursor.close();
         }
 
-        cursor.close();
         db.close();
-
-        return userList;
+        return list;
     }
 
-    /**
-     * Cập nhật thông tin user
-     */
+    // ================= UPDATE =================
     public boolean updateUser(User user) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(DatabaseHelper.COL_EMAIL, user.getEmail());
-        values.put(DatabaseHelper.COL_PASSWORD, user.getPassword());
         values.put(DatabaseHelper.COL_FULL_NAME, user.getFullName());
         values.put(DatabaseHelper.COL_PHONE, user.getPhone());
         values.put(DatabaseHelper.COL_ADDRESS, user.getAddress());
         values.put(DatabaseHelper.COL_ROLE, user.getRole());
         values.put(DatabaseHelper.COL_AVATAR, user.getAvatar());
 
-        int rowsAffected = db.update(DatabaseHelper.TABLE_USER,
+        // chỉ update password nếu có
+        if (user.getPassword() != null && !user.getPassword().isEmpty()) {
+            values.put(DatabaseHelper.COL_PASSWORD, user.getPassword());
+        }
+
+        int result = db.update(
+                DatabaseHelper.TABLE_USER,
                 values,
-                DatabaseHelper.COL_USER_ID + " = ?",
-                new String[]{String.valueOf(user.getId())});
+                DatabaseHelper.COL_USER_ID + "=?",
+                new String[]{String.valueOf(user.getId())}
+        );
 
         db.close();
-        return rowsAffected > 0;
+        return result > 0;
     }
 
-    /**
-     * Xóa user (chỉ admin)
-     */
+    // ================= DELETE =================
     public boolean deleteUser(int id) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
-        int rowsAffected = db.delete(DatabaseHelper.TABLE_USER,
-                DatabaseHelper.COL_USER_ID + " = ?",
-                new String[]{String.valueOf(id)});
+        int result = db.delete(
+                DatabaseHelper.TABLE_USER,
+                DatabaseHelper.COL_USER_ID + "=?",
+                new String[]{String.valueOf(id)}
+        );
 
         db.close();
-        return rowsAffected > 0;
+        return result > 0;
     }
 
-    /**
-     * Chuyển đổi Cursor thành User object
-     */
+    // ================= CURSOR → USER =================
     private User cursorToUser(Cursor cursor) {
         User user = new User();
 
@@ -217,7 +199,6 @@ public class UserDAO {
         user.setPassword(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_PASSWORD)));
         user.setFullName(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_FULL_NAME)));
 
-        // Các field có thể null
         int phoneIndex = cursor.getColumnIndex(DatabaseHelper.COL_PHONE);
         if (phoneIndex != -1) {
             user.setPhone(cursor.getString(phoneIndex));

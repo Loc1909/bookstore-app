@@ -13,10 +13,9 @@ public class User {
     private String avatar;
     private long createdAt;
 
-    // Constructor rỗng
-    public User() {}
+    public User() {
+    }
 
-    // Constructor đăng ký
     public User(String email, String password, String fullName, String role) {
         this.email = email;
         this.password = password;
@@ -25,10 +24,10 @@ public class User {
         this.createdAt = System.currentTimeMillis();
     }
 
-    // Constructor đầy đủ
     public User(int id, String username, String email, String password,
                 String fullName, String phone, String address,
                 String role, String avatar, long createdAt) {
+
         this.id = id;
         this.username = username;
         this.email = email;
@@ -41,41 +40,91 @@ public class User {
         this.createdAt = createdAt;
     }
 
-    // Getter & Setter
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
+    public int getId() {
+        return id;
+    }
 
-    public String getUsername() { return username; }
-    public void setUsername(String username) { this.username = username; }
+    public void setId(int id) {
+        this.id = id;
+    }
 
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
+    public String getUsername() {
+        return username;
+    }
 
-    public String getPassword() { return password; }
-    public void setPassword(String password) { this.password = password; }
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
-    public String getFullName() { return fullName; }
-    public void setFullName(String fullName) { this.fullName = fullName; }
+    public String getEmail() {
+        return email;
+    }
 
-    public String getPhone() { return phone; }
-    public void setPhone(String phone) { this.phone = phone; }
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-    public String getAddress() { return address; }
-    public void setAddress(String address) { this.address = address; }
+    public String getPassword() {
+        return password;
+    }
 
-    public String getRole() { return role; }
-    public void setRole(String role) { this.role = role; }
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
-    public String getAvatar() { return avatar; }
-    public void setAvatar(String avatar) { this.avatar = avatar; }
+    public String getFullName() {
+        return fullName;
+    }
 
-    public long getCreatedAt() { return createdAt; }
-    public void setCreatedAt(long createdAt) { this.createdAt = createdAt; }
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
+    }
+
+    public long getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(long createdAt) {
+        this.createdAt = createdAt;
+    }
 
     @Override
     public String toString() {
         return "User{" +
                 "id=" + id +
+                ", username='" + username + '\'' +
                 ", email='" + email + '\'' +
                 ", fullName='" + fullName + '\'' +
                 ", role='" + role + '\'' +

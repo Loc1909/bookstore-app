@@ -1,5 +1,6 @@
 package com.example.bookstore_app.database.dao;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -12,33 +13,71 @@ import java.util.List;
 
 public class CategoryDAO {
 
-    DatabaseHelper dbHelper;
+    private DatabaseHelper dbHelper;
 
     public CategoryDAO(Context context){
         dbHelper = new DatabaseHelper(context);
     }
 
     public List<Category> getAllCategories(){
-
         List<Category> list = new ArrayList<>();
-
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
-        Cursor cursor = db.rawQuery("SELECT * FROM categories", null);
+        Cursor cursor = db.rawQuery("SELECT * FROM " + DatabaseHelper.TABLE_CATEGORY, null);
 
-        if(cursor.moveToFirst()){
+        if(cursor != null && cursor.moveToFirst()){
             do{
                 int id = cursor.getInt(cursor.getColumnIndexOrThrow("id"));
                 String name = cursor.getString(cursor.getColumnIndexOrThrow("name"));
-
                 list.add(new Category(id, name));
+            } while(cursor.moveToNext());
 
-            }while(cursor.moveToNext());
+            cursor.close();
         }
 
-        cursor.close();
         db.close();
-
         return list;
+    }
+
+    public boolean addCategory(Category category) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put("name", category.getName());
+
+        long result = db.insert(DatabaseHelper.TABLE_CATEGORY, null, values);
+
+        db.close();
+        return result != -1;
+    }
+
+    public boolean updateCategory(Category category) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put("name", category.getName());
+
+        int result = db.update(
+                DatabaseHelper.TABLE_CATEGORY,
+                values,
+                "id=?",
+                new String[]{String.valueOf(category.getId())}
+        );
+
+        db.close();
+        return result > 0;
+    }
+
+    public boolean deleteCategory(int id) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        int result = db.delete(
+                DatabaseHelper.TABLE_CATEGORY,
+                "id=?",
+                new String[]{String.valueOf(id)}
+        );
+
+        db.close();
+        return result > 0;
     }
 }
