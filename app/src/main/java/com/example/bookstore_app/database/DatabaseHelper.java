@@ -1,13 +1,14 @@
 package com.example.bookstore_app.database;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "bookstore.db";
-    private static final int DATABASE_VERSION = 10;
+    private static final int DATABASE_VERSION = 11;
 
     // TABLE NAMES
     public static final String TABLE_BOOK = "books";
@@ -39,6 +40,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "id INTEGER PRIMARY KEY AUTOINCREMENT," +
                 "name TEXT UNIQUE)");
 
+
         // BOOK
         db.execSQL("CREATE TABLE " + TABLE_BOOK + " (" +
                 "id INTEGER PRIMARY KEY AUTOINCREMENT," +
@@ -68,6 +70,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "id INTEGER PRIMARY KEY AUTOINCREMENT," +
                 "user_id INTEGER," +
                 "order_date TEXT," +
+                "status TEXT DEFAULT 'NEW'," +
                 "FOREIGN KEY(user_id) REFERENCES users(id))");
 
         // ORDER ITEM
@@ -110,12 +113,29 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_ORDER_ITEM);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_ORDER);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_BOOK);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CATEGORY);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_USER);
+        if (oldVersion < 11) {
 
-        onCreate(db);
+            if (!isColumnExists(db, "orders", "status")) {
+                db.execSQL("ALTER TABLE orders ADD COLUMN status TEXT DEFAULT 'NEW'");
+            }
+
+            db.execSQL("UPDATE orders SET status = 'NEW' WHERE status IS NULL");
+        }
+    }
+
+    private boolean isColumnExists(SQLiteDatabase db, String tableName, String columnName) {
+        Cursor cursor = db.rawQuery("PRAGMA table_info(" + tableName + ")", null);
+
+        boolean exists = false;
+        while (cursor.moveToNext()) {
+            String colName = cursor.getString(1);
+            if (colName.equals(columnName)) {
+                exists = true;
+                break;
+            }
+        }
+
+        cursor.close();
+        return exists;
     }
 }

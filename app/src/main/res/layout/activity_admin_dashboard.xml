@@ -66,7 +66,8 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="1,284"
+                            android:id="@+id/txtTotalBooks"
+                            android:text="0"
                             android:textSize="18sp"
                             android:textStyle="bold"
                             android:textColor="#FFFFFF"/>
@@ -91,9 +92,10 @@
                         android:layout_marginEnd="8dp">
 
                         <TextView
+                            android:id="@+id/txtTotalUsers"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="342"
+                            android:text="0"
                             android:textSize="18sp"
                             android:textStyle="bold"
                             android:textColor="#FFFFFF"/>
@@ -117,9 +119,10 @@
                         android:padding="10dp">
 
                         <TextView
+                            android:id="@+id/txtTotalOrders"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="28"
+                            android:text="0"
                             android:textSize="18sp"
                             android:textStyle="bold"
                             android:textColor="#5DCAA5"/>
@@ -187,7 +190,8 @@
                         android:layout_height="wrap_content"/>
 
                     <TextView
-                        android:text="1,284 đầu sách"
+                        android:id="@+id/txtTotalBooksv2"
+                        android:text="0 đầu sách"
                         android:textSize="11sp"
                         android:textColor="#888780"
                         android:layout_width="wrap_content"
@@ -239,7 +243,8 @@
                         android:layout_height="wrap_content"/>
 
                     <TextView
-                        android:text="18 danh mục"
+                        android:id="@+id/txtTotalCategory"
+                        android:text="0 danh mục"
                         android:textSize="11sp"
                         android:textColor="#888780"
                         android:layout_width="wrap_content"
@@ -300,7 +305,8 @@
                         android:layout_height="wrap_content"/>
 
                     <TextView
-                        android:text="342 tài khoản"
+                        android:id="@+id/txtTotalUsersv2"
+                        android:text="0 tài khoản"
                         android:textSize="11sp"
                         android:textColor="#888780"
                         android:layout_width="wrap_content"
@@ -352,7 +358,8 @@
                         android:layout_height="wrap_content"/>
 
                     <TextView
-                        android:text="28 đơn mới"
+                        android:id="@+id/txtTotalOrdersv2"
+                        android:text="0 đơn mới"
                         android:textSize="11sp"
                         android:textColor="#888780"
                         android:layout_width="wrap_content"
