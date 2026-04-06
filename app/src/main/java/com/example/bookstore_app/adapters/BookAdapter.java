@@ -104,6 +104,13 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
                 listener.onDelete(bookList.get(pos));
             }
         });
+
+        //Add book to cart
+        holder.btnAddToCart.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onAddToCart(book);
+            }
+        });
     }
 
     @Override
@@ -152,6 +159,8 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
         void onEdit(Book book);
 
         void onDelete(Book book);
+
+        void onAddToCart(Book book);
     }
 
     // SEARCH FILTER

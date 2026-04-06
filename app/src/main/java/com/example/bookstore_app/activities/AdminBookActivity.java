@@ -87,6 +87,11 @@ public class AdminBookActivity extends AppCompatActivity {
                         .show();
             }
 
+            @Override
+            public void onAddToCart(Book book) {
+
+            }
+
         }, true);
 
         recyclerView.setAdapter(adapter);

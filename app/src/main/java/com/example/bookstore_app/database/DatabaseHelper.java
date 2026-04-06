@@ -8,7 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "bookstore.db";
-    private static final int DATABASE_VERSION = 11;
+    private static final int DATABASE_VERSION = 12;
 
     // TABLE NAMES
     public static final String TABLE_BOOK = "books";
@@ -16,8 +16,28 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String TABLE_USER = "users";
     public static final String TABLE_ORDER = "orders";
     public static final String TABLE_ORDER_ITEM = "order_items";
+    public static final String TABLE_CART = "cart";
 
-    // USER COLUMNS
+    // BOOK COLUMNS
+    public static final String COL_BOOK_ID = "id";
+    public static final String COL_TITLE = "title";
+    public static final String COL_AUTHOR = "author";
+    public static final String COL_PRICE = "price";
+    public static final String COL_IMAGE = "imageUrl";
+    public static final String COL_CATEGORY_ID = "category_id";
+    public static final String COL_DESCRIPTION = "description";
+    public static final String COL_STOCK = "stock";
+
+    public static final String COL_CART_ID = "cart_id";
+    public static final String COL_CART_BOOK_ID = "bookId";
+    public static final String COL_CART_TITLE = "title";
+    public static final String COL_CART_PRICE = "price";
+    public static final String COL_CART_QUANTITY = "quantity";
+
+    // CATEGORY
+    public static final String COL_CATEGORY_NAME = "name";
+
+    // USER
     public static final String COL_USER_ID = "id";
     public static final String COL_EMAIL = "email";
     public static final String COL_PASSWORD = "password";
@@ -39,7 +59,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("CREATE TABLE " + TABLE_CATEGORY + " (" +
                 "id INTEGER PRIMARY KEY AUTOINCREMENT," +
                 "name TEXT UNIQUE)");
-
 
         // BOOK
         db.execSQL("CREATE TABLE " + TABLE_BOOK + " (" +
@@ -83,6 +102,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "FOREIGN KEY(order_id) REFERENCES orders(id)," +
                 "FOREIGN KEY(book_id) REFERENCES books(id))");
 
+        db.execSQL("CREATE TABLE " + TABLE_CART + " (" +
+                COL_CART_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                COL_CART_BOOK_ID + " INTEGER, " +
+                COL_CART_TITLE + " TEXT, " +
+                COL_CART_PRICE + " REAL, " +
+                COL_CART_QUANTITY + " INTEGER)");
+
         insertSampleData(db);
     }
 
@@ -113,13 +139,21 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
+        // Giữ logic cũ
         if (oldVersion < 11) {
-
             if (!isColumnExists(db, "orders", "status")) {
                 db.execSQL("ALTER TABLE orders ADD COLUMN status TEXT DEFAULT 'NEW'");
             }
-
             db.execSQL("UPDATE orders SET status = 'NEW' WHERE status IS NULL");
+        }
+
+        if (oldVersion < 12) {
+            db.execSQL("CREATE TABLE IF NOT EXISTS " + TABLE_CART + " (" +
+                    COL_CART_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    COL_CART_BOOK_ID + " INTEGER, " +
+                    COL_CART_TITLE + " TEXT, " +
+                    COL_CART_PRICE + " REAL, " +
+                    COL_CART_QUANTITY + " INTEGER)");
         }
     }
 
