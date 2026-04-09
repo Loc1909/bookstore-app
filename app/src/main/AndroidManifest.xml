@@ -31,23 +31,6 @@
         <activity android:name=".activities.AddBookActivity" android:exported="false"/>
         <activity android:name=".activities.EditBookActivity" android:exported="false"/>
 
-<<<<<<< HEAD
-        <activity
-            android:name=".activities.EditBookActivity"
-            android:exported="false"/>
-        <activity
-            android:name=".activities.AdminUserActivity"
-            android:exported="false"/>
-        
-        <activity
-            android:name=".activities.AdminCategoryActivity"
-            android:exported="false"/>
-
-        <activity
-            android:name=".activities.CartActivity"
-            android:exported="false" />
-=======
->>>>>>> 6f167832cd5a2a9e1ecab1b81b1b38652eaae271
     </application>
 
 </manifest>
