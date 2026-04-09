@@ -36,7 +36,7 @@ public class AdminUserActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        
+
         // Safety check logic like AdminDashboardActivity
         sessionManager = new SessionManager(this);
         // if (!sessionManager.isLoggedIn() || !sessionManager.isAdmin()) {
@@ -108,7 +108,7 @@ public class AdminUserActivity extends AppCompatActivity {
             etFullName.setText(user.getFullName());
             etPhone.setText(user.getPhone());
             etAddress.setText(user.getAddress());
-            
+
             if ("admin".equals(user.getRole())) {
                 rbAdmin.setChecked(true);
             } else {

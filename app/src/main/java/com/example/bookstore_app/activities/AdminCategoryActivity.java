@@ -36,10 +36,17 @@ public class AdminCategoryActivity extends AppCompatActivity {
 
         Toolbar toolbar = findViewById(R.id.toolbarCategory);
         setSupportActionBar(toolbar);
-        if(getSupportActionBar() != null) {
+
+        if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
-        toolbar.setNavigationOnClickListener(v -> onBackPressed());
+
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
 
         rvCategories = findViewById(R.id.rvCategories);
         fabAddCategory = findViewById(R.id.fabAddCategory);
@@ -64,21 +71,40 @@ public class AdminCategoryActivity extends AppCompatActivity {
 
         loadCategories();
 
-        fabAddCategory.setOnClickListener(v -> showCategoryDialog(null));
+        fabAddCategory.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showCategoryDialog(null);
+            }
+        });
     }
 
+    // ================= LOAD DATA (BACKGROUND THREAD) =================
     private void loadCategories() {
-        categoryList.clear();
-        categoryList.addAll(categoryDAO.getAllCategories());
-        adapter.notifyDataSetChanged();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                final List<Category> data = categoryDAO.getAllCategories();
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        categoryList.clear();
+                        categoryList.addAll(data);
+                        adapter.notifyDataSetChanged();
+                    }
+                });
+            }
+        }).start();
     }
 
-    private void showCategoryDialog(Category category) {
+    // ================= ADD / EDIT =================
+    private void showCategoryDialog(final Category category) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         View view = LayoutInflater.from(this).inflate(R.layout.dialog_category, null);
         builder.setView(view);
 
-        EditText etCategoryName = view.findViewById(R.id.etCategoryName);
+        final EditText etCategoryName = view.findViewById(R.id.etCategoryName);
 
         if (category != null) {
             builder.setTitle("Edit Category");
@@ -87,51 +113,96 @@ public class AdminCategoryActivity extends AppCompatActivity {
             builder.setTitle("Add Category");
         }
 
-        builder.setPositiveButton("Save", (dialog, which) -> {
-            String name = etCategoryName.getText().toString().trim();
-            if (name.isEmpty()) {
-                Toast.makeText(AdminCategoryActivity.this, "Name cannot be empty", Toast.LENGTH_SHORT).show();
-                return;
-            }
+        builder.setPositiveButton("Save", null);
+        builder.setNegativeButton("Cancel", null);
 
-            if (category == null) {
-                // Add
-                Category newCat = new Category();
-                newCat.setName(name);
-                if (categoryDAO.addCategory(newCat)) {
-                    Toast.makeText(AdminCategoryActivity.this, "Added successfully", Toast.LENGTH_SHORT).show();
-                    loadCategories();
-                } else {
-                    Toast.makeText(AdminCategoryActivity.this, "Failed to add", Toast.LENGTH_SHORT).show();
+        final AlertDialog dialog = builder.create();
+        dialog.show();
+
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                final String name = etCategoryName.getText().toString().trim();
+
+                if (name.isEmpty()) {
+                    etCategoryName.setError("Name cannot be empty");
+                    return;
                 }
-            } else {
-                // Edit
-                category.setName(name);
-                if (categoryDAO.updateCategory(category)) {
-                    Toast.makeText(AdminCategoryActivity.this, "Updated successfully", Toast.LENGTH_SHORT).show();
-                    loadCategories();
-                } else {
-                    Toast.makeText(AdminCategoryActivity.this, "Failed to update", Toast.LENGTH_SHORT).show();
-                }
+
+                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        final boolean success;
+
+                        if (category == null) {
+                            Category newCat = new Category();
+                            newCat.setName(name);
+                            success = categoryDAO.addCategory(newCat);
+                        } else {
+                            category.setName(name);
+                            success = categoryDAO.updateCategory(category);
+                        }
+
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+
+                                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
+
+                                if (success) {
+                                    Toast.makeText(AdminCategoryActivity.this,
+                                            category == null ? "Added successfully" : "Updated successfully",
+                                            Toast.LENGTH_SHORT).show();
+
+                                    dialog.dismiss();
+                                    loadCategories();
+                                } else {
+                                    Toast.makeText(AdminCategoryActivity.this,
+                                            "Operation failed",
+                                            Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
+                    }
+                }).start();
             }
         });
-
-        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
-        AlertDialog dialog = builder.create();
-        dialog.show();
     }
 
-    private void confirmDeleteCategory(Category category) {
+    // ================= DELETE =================
+    private void confirmDeleteCategory(final Category category) {
         new AlertDialog.Builder(this)
                 .setTitle("Delete Category")
-                .setMessage("Are you sure you want to delete this category?")
+                .setMessage("Are you sure?")
                 .setPositiveButton("Delete", (dialog, which) -> {
-                    if (categoryDAO.deleteCategory(category.getId())) {
-                        Toast.makeText(AdminCategoryActivity.this, "Deleted successfully", Toast.LENGTH_SHORT).show();
-                        loadCategories();
-                    } else {
-                        Toast.makeText(AdminCategoryActivity.this, "Failed to delete", Toast.LENGTH_SHORT).show();
-                    }
+
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            final boolean success = categoryDAO.deleteCategory(category.getId());
+
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (success) {
+                                        Toast.makeText(AdminCategoryActivity.this,
+                                                "Deleted successfully",
+                                                Toast.LENGTH_SHORT).show();
+                                        loadCategories();
+                                    } else {
+                                        Toast.makeText(AdminCategoryActivity.this,
+                                                "Delete failed",
+                                                Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
+                        }
+                    }).start();
+
                 })
                 .setNegativeButton("Cancel", null)
                 .show();
