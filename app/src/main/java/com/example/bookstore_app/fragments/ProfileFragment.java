@@ -90,20 +90,22 @@ public class ProfileFragment extends Fragment {
             txtMemberSince.setText(sdf.format(new Date(user.getCreatedAt())));
         }
 
-        if (user.getAvatar() != null && !user.getAvatar().isEmpty()) {
+        // ===== Avatar =====
+        String avatarUrl = user.getAvatar();
+        if (avatarUrl != null && !avatarUrl.isEmpty()) {
             Glide.with(this)
-                    .load(user.getAvatar())
-                    .placeholder(R.drawable.ic_launcher_foreground)
+                    .load(avatarUrl)
+                    .placeholder(R.drawable.ic_user)
+                    .error(R.drawable.ic_user)
                     .circleCrop()
                     .into(imgAvatar);
         } else {
-            imgAvatar.setImageResource(R.drawable.ic_launcher_foreground);
+            imgAvatar.setImageResource(R.drawable.ic_user);
         }
 
         adminCard.setVisibility("admin".equalsIgnoreCase(role)
                 ? View.VISIBLE : View.GONE);
     }
-
     private void logout() {
         sessionManager.logout();
 
