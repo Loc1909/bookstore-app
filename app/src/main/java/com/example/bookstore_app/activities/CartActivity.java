@@ -58,7 +58,7 @@ public class CartActivity extends AppCompatActivity {
 
             @Override
             public void onDelete(CartItem item) {
-                cartDAO.updateQuantity(item.getId(), 0); // 0 sẽ xóa khỏi db
+                cartDAO.deleteItem(item.getId());
                 loadCartData();
             }
         });

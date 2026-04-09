@@ -1,9 +1,33 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
+
+    <!-- Base application theme -->
     <style name="Base.Theme.Bookstoreapp" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="colorPrimary">@color/dark_espresso</item>
+        <item name="colorOnPrimary">@color/cream_light</item>
+        <item name="colorSecondary">@color/gold_muted</item>
+        <item name="colorOnSecondary">@color/dark_espresso</item>
+        <item name="colorSurface">@color/white</item>
+        <item name="colorOnSurface">@color/dark_espresso</item>
+
+        <item name="android:statusBarColor">@color/dark_espresso</item>
+        <item name="android:windowLightStatusBar">false</item>
     </style>
 
+    <!-- App theme -->
     <style name="Theme.Bookstoreapp" parent="Base.Theme.Bookstoreapp" />
+
+    <!-- Category chip styles -->
+    <style name="CategoryChip" parent="Widget.Material3.Chip.Filter">
+        <item name="android:textColor">@color/gold_muted</item>
+        <item name="chipBackgroundColor">@android:color/transparent</item>
+        <item name="chipStrokeColor">@color/card_border</item>
+        <item name="chipStrokeWidth">1dp</item>
+    </style>
+
+    <style name="CategoryChipSelected" parent="CategoryChip">
+        <item name="android:textColor">@color/cream_light</item>
+        <item name="chipBackgroundColor">@color/dark_espresso</item>
+        <item name="chipStrokeWidth">0dp</item>
+    </style>
+
 </resources>

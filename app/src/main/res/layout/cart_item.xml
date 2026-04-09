@@ -16,7 +16,7 @@
             android:layout_width="80dp"
             android:layout_height="100dp"
             android:scaleType="centerCrop"
-            android:src="@drawable/ic_launcher_background" />
+            android:src="@drawable/ic_image_picker" />
 
         <LinearLayout
             android:layout_width="0dp"

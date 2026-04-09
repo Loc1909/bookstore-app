@@ -1,110 +1,132 @@
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
-
-    app:cardCornerRadius="10dp"
-    app:cardElevation="6dp">
+    android:layout_marginHorizontal="0dp"
+    android:layout_marginVertical="6dp"
+    app:cardBackgroundColor="@android:color/white"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="0dp"
+    app:strokeColor="@color/card_border"
+    app:strokeWidth="1dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="10dp">
+        android:padding="12dp">
 
-        <!-- IMAGE -->
-
-        <ImageView
-            android:id="@+id/imgBook"
+        <!-- Book Cover -->
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="80dp"
-            android:layout_height="100dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/ic_launcher_background" />
+            android:layout_height="110dp"
+            app:cardCornerRadius="10dp"
+            app:cardElevation="0dp">
 
-        <!-- CONTENT -->
+            <ImageView
+                android:id="@+id/imgBook"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_image_picker"/>
+        </com.google.android.material.card.MaterialCardView>
 
+        <!-- Content -->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="0dp"
-            android:layout_height="100dp"
-            android:layout_marginStart="10dp"
+            android:layout_height="110dp"
+            android:layout_marginStart="12dp"
             android:layout_weight="1">
 
             <TextView
                 android:id="@+id/txtTitle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:textSize="18sp"
+                android:textSize="15sp"
                 android:textStyle="bold"
+                android:textColor="@color/dark_espresso"
+                android:fontFamily="serif"
+                android:maxLines="2"
+                android:ellipsize="end"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"/>
 
             <TextView
                 android:id="@+id/txtAuthor"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="#555"
+                android:layout_marginTop="2dp"
+                android:textColor="@color/gold_muted"
+                android:textSize="12sp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/txtTitle" />
+                app:layout_constraintTop_toBottomOf="@id/txtTitle"/>
 
             <TextView
                 android:id="@+id/txtPrice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:textColor="#2E7D32"
+                android:textColor="@color/gold_primary"
+                android:textSize="15sp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/txtAuthor" />
+                app:layout_constraintTop_toBottomOf="@id/txtAuthor"/>
 
-            <!-- ACTION BUTTONS -->
-
+            <!-- Action Buttons -->
             <LinearLayout
                 android:id="@+id/actionButtons"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginEnd="2dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent">
 
                 <Button
                     android:id="@+id/btnBuyNow"
-                    android:layout_width="match_parent"
-                    android:layout_height="36dp"
-                    android:backgroundTint="@color/white"
-                    android:text="Buy Now"
-                    android:textColor="@color/black" />
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Mua ngay"
+                    android:textSize="11sp"
+                    android:textColor="@color/dark_espresso"
+                    android:backgroundTint="@color/gold_primary"
+                    android:layout_marginRight="10dp"
+                    style="@style/Widget.Material3.Button"/>
 
                 <ImageButton
                     android:id="@+id/btnEditBook"
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:background="@drawable/circle_button_bg"
                     android:contentDescription="Edit"
-                    android:src="@drawable/edit_24px" />
+                    android:src="@drawable/edit_24px"
+                    android:padding="6dp"
+                    app:tint="@color/gold_muted"/>
 
                 <ImageButton
                     android:id="@+id/btnAddToCart"
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:background="@drawable/circle_button_bg"
                     android:contentDescription="Cart"
-                    android:src="@drawable/add_shopping_cart_24px" />
+                    android:src="@drawable/add_shopping_cart_24px"
+                    android:padding="6dp"
+                    app:tint="@color/gold_primary"/>
 
                 <ImageButton
                     android:id="@+id/btnDeleteBook"
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:background="@drawable/circle_button_bg"
                     android:contentDescription="Delete"
-                    android:src="@drawable/delete_24px" />
-
+                    android:src="@drawable/delete_24px"
+                    android:padding="6dp"
+                    app:tint="#E57373"/>
             </LinearLayout>
-
         </androidx.constraintlayout.widget.ConstraintLayout>
-
     </LinearLayout>
-
-</androidx.cardview.widget.CardView>
+</com.google.android.material.card.MaterialCardView>

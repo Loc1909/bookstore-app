@@ -16,6 +16,10 @@ import com.example.bookstore_app.database.dao.CategoryDAO;
 import com.example.bookstore_app.models.Book;
 import com.example.bookstore_app.models.Category;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -65,8 +69,13 @@ public class AddBookActivity extends AppCompatActivity {
                     if (result.getResultCode() == RESULT_OK && result.getData() != null) {
                         Uri uri = result.getData().getData();
                         if (uri != null) {
-                            imagePath = uri.toString();
-                            imgBook.setImageURI(uri);
+                            String path = saveImageToInternalStorage(uri);
+                            if (path != null) {
+                                imagePath = path;  // dùng để insert vào DB
+                                imgBook.setImageURI(Uri.fromFile(new File(path))); // hiển thị trực tiếp
+                                imgBook.setVisibility(ImageView.VISIBLE);
+                                imgPlaceholder.setVisibility(LinearLayout.GONE);
+                            }
 
                             imgBook.setVisibility(ImageView.VISIBLE);
                             imgPlaceholder.setVisibility(LinearLayout.GONE);
@@ -84,6 +93,31 @@ public class AddBookActivity extends AppCompatActivity {
 
         btnSave.setOnClickListener(v -> saveBook());
         btnBack.setOnClickListener(v-> finish());
+    }
+
+    // Hàm lưu ảnh vào internal storage và trả về đường dẫn tuyệt đối
+    private String saveImageToInternalStorage(Uri uri) {
+        try {
+            InputStream inputStream = getContentResolver().openInputStream(uri);
+
+            File file = new File(getFilesDir(), "book_" + System.currentTimeMillis() + ".jpg");
+
+            OutputStream outputStream = new FileOutputStream(file);
+
+            byte[] buffer = new byte[1024];
+            int length;
+            while ((length = inputStream.read(buffer)) > 0) {
+                outputStream.write(buffer, 0, length);
+            }
+
+            inputStream.close();
+            outputStream.close();
+
+            return file.getAbsolutePath(); //  trả về path chuẩn để lưu DB
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     private void loadCategories() {

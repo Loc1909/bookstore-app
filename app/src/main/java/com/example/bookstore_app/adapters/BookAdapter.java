@@ -4,11 +4,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.Filter;
-import android.widget.Filterable;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -18,99 +15,103 @@ import com.bumptech.glide.Glide;
 import com.example.bookstore_app.R;
 import com.example.bookstore_app.models.Book;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder> implements Filterable {
+public class BookAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
+    public static final int TYPE_HORIZONTAL = 0;
+    public static final int TYPE_VERTICAL = 1;
+
+    private static final int VIEW_TYPE_BOOK = 0;
+    private static final int VIEW_TYPE_LOADING = 1;
+
+    private int layoutType;
     private List<Book> bookList;
-    private List<Book> bookListFull;
     private OnBookActionListener listener;
     private boolean isAdmin;
 
-    public BookAdapter(List<Book> bookList, OnBookActionListener listener, boolean isAdmin) {
-
-        this.bookList = new ArrayList<>(bookList);
-        this.bookListFull = new ArrayList<>(bookList);
+    public BookAdapter(List<Book> bookList, OnBookActionListener listener, boolean isAdmin, int layoutType) {
+        this.bookList = bookList;
         this.listener = listener;
         this.isAdmin = isAdmin;
+        this.layoutType = layoutType;
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return bookList.get(position) == null ? VIEW_TYPE_LOADING : VIEW_TYPE_BOOK;
     }
 
     @NonNull
     @Override
-    public BookViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+
+        if (viewType == VIEW_TYPE_LOADING) {
+            View view = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.item_loading, parent, false);
+            return new LoadingViewHolder(view);
+        }
+
+        int layoutId = (layoutType == TYPE_VERTICAL)
+                ? R.layout.item_book_vertical
+                : R.layout.item_book;
 
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_book, parent, false);
+                .inflate(layoutId, parent, false);
 
         return new BookViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull BookViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+
+        if (holder instanceof LoadingViewHolder) return;
 
         Book book = bookList.get(position);
+        BookViewHolder h = (BookViewHolder) holder;
 
-        holder.txtTitle.setText(book.getTitle());
-        holder.txtAuthor.setText(book.getAuthor());
-        holder.txtPrice.setText("$" + book.getPrice());
+        h.txtTitle.setText(book.getTitle());
+        h.txtAuthor.setText(book.getAuthor());
+        h.txtPrice.setText(book.getPrice() + "đ");
 
         if (book.getImageUrl() != null && !book.getImageUrl().isEmpty()) {
-
-            Glide.with(holder.itemView.getContext())
+            Glide.with(h.itemView.getContext())
                     .load(book.getImageUrl())
                     .placeholder(R.drawable.ic_launcher_background)
-                    .into(holder.imgBook);
-
+                    .into(h.imgBook);
         } else {
-
-            holder.imgBook.setImageResource(R.drawable.ic_launcher_background);
+            h.imgBook.setImageResource(R.drawable.ic_launcher_background);
         }
 
         if (!isAdmin) {
-            holder.btnEditBook.setVisibility(View.GONE);
-            holder.btnDeleteBook.setVisibility(View.GONE);
+            if (h.btnEditBook != null) h.btnEditBook.setVisibility(View.GONE);
+            if (h.btnDeleteBook != null) h.btnDeleteBook.setVisibility(View.GONE);
         } else {
-            holder.btnBuyNow.setVisibility(View.GONE);
-            holder.btnAddToCart.setVisibility(View.GONE);
+            if (h.btnAddToCart != null) h.btnAddToCart.setVisibility(View.GONE);
+            if (h.btnBuyNow != null) h.btnBuyNow.setVisibility(View.GONE);
         }
 
-        // Click item
-        holder.itemView.setOnClickListener(v -> {
-
-            int pos = holder.getAdapterPosition();
-
-            if (listener != null && pos != RecyclerView.NO_POSITION) {
-                listener.onBookClick(bookList.get(pos));
-            }
+        h.itemView.setOnClickListener(v -> {
+            if (listener != null) listener.onBookClick(book);
         });
 
-        // Edit book
-        holder.btnEditBook.setOnClickListener(v -> {
+        if (h.btnAddToCart != null) {
+            h.btnAddToCart.setOnClickListener(v -> {
+                if (listener != null) listener.onAddToCart(book);
+            });
+        }
 
-            int pos = holder.getAdapterPosition();
+        if (h.btnEditBook != null) {
+            h.btnEditBook.setOnClickListener(v -> {
+                if (listener != null) listener.onEdit(book);
+            });
+        }
 
-            if (listener != null && pos != RecyclerView.NO_POSITION) {
-                listener.onEdit(bookList.get(pos));
-            }
-        });
-
-        // Delete book
-        holder.btnDeleteBook.setOnClickListener(v -> {
-
-            int pos = holder.getAdapterPosition();
-
-            if (listener != null && pos != RecyclerView.NO_POSITION) {
-                listener.onDelete(bookList.get(pos));
-            }
-        });
-
-        //Add book to cart
-        holder.btnAddToCart.setOnClickListener(v -> {
-            if (listener != null) {
-                listener.onAddToCart(book);
-            }
-        });
+        if (h.btnDeleteBook != null) {
+            h.btnDeleteBook.setOnClickListener(v -> {
+                if (listener != null) listener.onDelete(book);
+            });
+        }
     }
 
     @Override
@@ -118,8 +119,8 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
         return bookList.size();
     }
 
+    // ===== VIEW HOLDER =====
     static class BookViewHolder extends RecyclerView.ViewHolder {
-
         TextView txtTitle, txtAuthor, txtPrice;
         ImageView imgBook;
         Button btnBuyNow;
@@ -140,74 +141,24 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
         }
     }
 
-    // Update RecyclerView data
-    public void updateData(List<Book> newList) {
-
-        bookList.clear();
-        bookList.addAll(newList);
-
-        bookListFull.clear();
-        bookListFull.addAll(newList);
-
-        notifyDataSetChanged();
+    static class LoadingViewHolder extends RecyclerView.ViewHolder {
+        public LoadingViewHolder(@NonNull View itemView) {
+            super(itemView);
+        }
     }
 
     public interface OnBookActionListener {
-
         void onBookClick(Book book);
-
         void onEdit(Book book);
-
         void onDelete(Book book);
-
         void onAddToCart(Book book);
     }
 
-    // SEARCH FILTER
-
-    @Override
-    public Filter getFilter() {
-        return bookFilter;
+    public void updateData(List<Book> newList) {
+        this.bookList.clear();
+        this.bookList.addAll(newList);
+        notifyDataSetChanged();
     }
 
-    private Filter bookFilter = new Filter() {
 
-        @Override
-        protected FilterResults performFiltering(CharSequence constraint) {
-
-            List<Book> filteredList = new ArrayList<>();
-
-            if (constraint == null || constraint.length() == 0) {
-
-                filteredList.addAll(bookListFull);
-
-            } else {
-
-                String filterPattern = constraint.toString().toLowerCase().trim();
-
-                for (Book book : bookListFull) {
-
-                    if (book.getTitle().toLowerCase().contains(filterPattern)
-                            || book.getAuthor().toLowerCase().contains(filterPattern)) {
-
-                        filteredList.add(book);
-                    }
-                }
-            }
-
-            FilterResults results = new FilterResults();
-            results.values = filteredList;
-
-            return results;
-        }
-
-        @Override
-        protected void publishResults(CharSequence constraint, FilterResults results) {
-
-            bookList.clear();
-            bookList.addAll((List<Book>) results.values);
-
-            notifyDataSetChanged();
-        }
-    };
 }

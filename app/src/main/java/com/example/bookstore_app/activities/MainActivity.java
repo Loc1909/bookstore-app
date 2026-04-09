@@ -1,8 +1,10 @@
 package com.example.bookstore_app.activities;
 
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.bookstore_app.R;
@@ -20,6 +22,17 @@ public class MainActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().setStatusBarColor(
+                    ContextCompat.getColor(this, R.color.dark_espresso)
+            );
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            // icon trắng
+            getWindow().getDecorView().setSystemUiVisibility(0);
+        }
 
         bottomNavigation = findViewById(R.id.bottomNavigation);
 

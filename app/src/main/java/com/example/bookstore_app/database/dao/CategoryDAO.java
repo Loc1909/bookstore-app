@@ -19,18 +19,18 @@ public class CategoryDAO {
         dbHelper = new DatabaseHelper(context);
     }
 
-    public List<Category> getAllCategories(){
+    public List<Category> getAllCategories() {
         List<Category> list = new ArrayList<>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
         Cursor cursor = db.rawQuery("SELECT * FROM " + DatabaseHelper.TABLE_CATEGORY, null);
 
-        if(cursor != null && cursor.moveToFirst()){
-            do{
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
                 int id = cursor.getInt(cursor.getColumnIndexOrThrow("id"));
                 String name = cursor.getString(cursor.getColumnIndexOrThrow("name"));
                 list.add(new Category(id, name));
-            } while(cursor.moveToNext());
+            } while (cursor.moveToNext());
 
             cursor.close();
         }
