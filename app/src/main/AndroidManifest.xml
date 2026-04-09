@@ -31,6 +31,9 @@
         <activity android:name=".activities.AddBookActivity" android:exported="false"/>
         <activity android:name=".activities.EditBookActivity" android:exported="false"/>
 
+        <!-- Cart -->
+        <activity android:name=".activities.CartActivity" android:exported="false"/>
+
     </application>
 
 </manifest>

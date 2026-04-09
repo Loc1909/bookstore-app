@@ -19,10 +19,14 @@ import com.example.bookstore_app.adapters.BookAdapter;
 import com.example.bookstore_app.database.dao.BookDAO;
 import com.example.bookstore_app.database.dao.CartDAO;
 import com.example.bookstore_app.models.Book;
+import com.example.bookstore_app.utils.SessionManager;
 
 import java.util.List;
 
 public class HomeFragment extends Fragment {
+
+    private int currentUserId;
+    private SessionManager sessionManager;
 
     RecyclerView recyclerView;
     SearchView searchView;
@@ -47,6 +51,13 @@ public class HomeFragment extends Fragment {
             Intent intent = new Intent(getActivity(), CartActivity.class);
             startActivity(intent);
         });
+        sessionManager = new SessionManager(requireContext());
+        currentUserId = sessionManager.getUserId();
+
+        if (currentUserId == -1) {
+            Toast.makeText(requireContext(), "Bạn chưa đăng nhập!", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         bookDAO = new BookDAO(getContext());
 
@@ -71,7 +82,7 @@ public class HomeFragment extends Fragment {
 
             @Override
             public void onAddToCart(Book book) {
-                cartDAO.addToCart(book);
+                cartDAO.addToCart(currentUserId,book);
                 Toast.makeText(getContext(), "Đã thêm vào giỏ", Toast.LENGTH_SHORT).show();
             }
         }, false);

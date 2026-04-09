@@ -16,6 +16,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String TABLE_USER = "users";
     public static final String TABLE_ORDER = "orders";
     public static final String TABLE_ORDER_ITEM = "order_items";
+    public static final String TABLE_CART = "cart";
+
+    // CART COLUMNS
+    public static final String COL_CART_ID = "id";
+    public static final String COL_CART_USER_ID = "userId";
+    public static final String COL_CART_BOOK_ID = "bookId";
+    public static final String COL_CART_TITLE = "title";
+    public static final String COL_CART_PRICE = "price";
+    public static final String COL_CART_QUANTITY = "quantity";
 
     // USER COLUMNS
     public static final String COL_USER_ID = "id";
@@ -68,20 +77,37 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // ORDER
         db.execSQL("CREATE TABLE " + TABLE_ORDER + " (" +
                 "id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                "user_id INTEGER," +
-                "order_date TEXT," +
-                "status TEXT DEFAULT 'NEW'," +
-                "FOREIGN KEY(user_id) REFERENCES users(id))");
+                "user_id INTEGER NOT NULL," +
+                "order_date INTEGER NOT NULL," +   // timestamp (long)
+                "total_price REAL NOT NULL," +
+                "status TEXT DEFAULT 'PENDING'," +
+                "FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE" +
+                ")");
 
         // ORDER ITEM
         db.execSQL("CREATE TABLE " + TABLE_ORDER_ITEM + " (" +
                 "id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                "order_id INTEGER," +
-                "book_id INTEGER," +
-                "quantity INTEGER," +
-                "price REAL," +
-                "FOREIGN KEY(order_id) REFERENCES orders(id)," +
-                "FOREIGN KEY(book_id) REFERENCES books(id))");
+                "order_id INTEGER NOT NULL," +
+                "book_id INTEGER NOT NULL," +
+                "quantity INTEGER NOT NULL," +
+                "price REAL NOT NULL," +
+                "FOREIGN KEY(order_id) REFERENCES orders(id) ON DELETE CASCADE," +
+                "FOREIGN KEY(book_id) REFERENCES books(id)" +
+                ")");
+
+        // CREATE CART TABLE
+        String CREATE_CART_TABLE =
+                "CREATE TABLE " + TABLE_CART + " (" +
+                        COL_CART_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                        COL_CART_USER_ID + " INTEGER, " +
+                        COL_CART_BOOK_ID + " INTEGER, " +
+                        COL_CART_TITLE + " TEXT, " +
+                        COL_CART_PRICE + " REAL, " +
+                        COL_CART_QUANTITY + " INTEGER, " +
+                        "UNIQUE(" + COL_CART_USER_ID + ", " + COL_CART_BOOK_ID + ")" +
+                        ")";
+
+        db.execSQL(CREATE_CART_TABLE);
 
         insertSampleData(db);
     }
@@ -104,7 +130,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("INSERT INTO users(email,password,fullName,role,createdAt) VALUES ('user@gmail.com','123','User','user'," + now + ")");
 
         // ORDER
-        db.execSQL("INSERT INTO orders(user_id,order_date) VALUES (2,'2024-01-01')");
+        db.execSQL("INSERT INTO orders (user_id, order_date, total_price, status) VALUES (1, " + now + ", 150000, 'PENDING')");
 
         // ORDER ITEM
         db.execSQL("INSERT INTO order_items(order_id,book_id,quantity,price) VALUES (1,1,2,120000)");
@@ -113,14 +139,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
-        if (oldVersion < 11) {
-
-            if (!isColumnExists(db, "orders", "status")) {
-                db.execSQL("ALTER TABLE orders ADD COLUMN status TEXT DEFAULT 'NEW'");
-            }
-
-            db.execSQL("UPDATE orders SET status = 'NEW' WHERE status IS NULL");
-        }
+//        if (oldVersion < 11) {
+//
+//            if (!isColumnExists(db, "orders", "status")) {
+//                db.execSQL("ALTER TABLE orders ADD COLUMN status TEXT DEFAULT 'NEW'");
+//            }
+//
+//            db.execSQL("UPDATE orders SET status = 'NEW' WHERE status IS NULL");
+//        }
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CART);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_BOOK);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CATEGORY);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_ORDER);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_USER);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_ORDER);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_ORDER_ITEM);
+        onCreate(db);
     }
 
     private boolean isColumnExists(SQLiteDatabase db, String tableName, String columnName) {
