@@ -23,6 +23,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        com.example.bookstore_app.database.DatabaseHelper dbHelper =
+                new com.example.bookstore_app.database.DatabaseHelper(this);
+        dbHelper.getWritableDatabase();
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getWindow().setStatusBarColor(
                     ContextCompat.getColor(this, R.color.dark_espresso)
