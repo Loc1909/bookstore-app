@@ -60,6 +60,20 @@ public class CartDAO {
         db.delete("cart", "id = ?", new String[]{String.valueOf(cartId)});
     }
 
+    public int getTotalQuantity() {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor cursor = db.rawQuery(
+                "SELECT SUM(" + DatabaseHelper.COL_CART_QUANTITY + ") FROM " + DatabaseHelper.TABLE_CART,
+                null
+        );
+        int total = 0;
+        if (cursor.moveToFirst()) {
+            total = cursor.getInt(0);
+        }
+        cursor.close();
+        return total;
+    }
+
     // Lấy toàn bộ cart với imageUrl
     public List<CartItem> getAllCart() {
         List<CartItem> list = new ArrayList<>();
