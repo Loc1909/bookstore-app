@@ -132,7 +132,6 @@ public class CheckoutActivity extends AppCompatActivity {
             return;
         }
 
-        Toast.makeText(this, "Đặt hàng thành công!", Toast.LENGTH_LONG).show();
 
         OrderDAO orderDAO = new OrderDAO(this);
         long result = orderDAO.createOrder(currentUserId, checkoutList, subtotal + SHIPPING_FEE);

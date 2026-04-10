@@ -8,7 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "bookstore.db";
-    private static final int DATABASE_VERSION = 15;
+    private static final int DATABASE_VERSION = 16;
 
     // ------------------- TABLE NAMES -------------------
     public static final String TABLE_BOOK = "books";
@@ -199,6 +199,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("INSERT INTO " + TABLE_USER + "(" +
                 COL_EMAIL + "," + COL_PASSWORD + "," + COL_FULL_NAME + "," + COL_ROLE + "," + COL_CREATED_AT +
                 ") VALUES ('user@gmail.com','123','User','user'," + now + ")");
+
+
+        db.execSQL("INSERT INTO " + TABLE_ORDER + "(" +
+                COL_ORDER_USER_ID + "," + COL_ORDER_DATE + "," + COL_ORDER_TOTAL_PRICE + "," +
+                COL_ORDER_STATUS + ") VALUES (1, " + now + ", 150000, 'TESTING')");
+
+        db.execSQL("INSERT INTO " + TABLE_ORDER_ITEM + "(" +
+                COL_ORDER_ITEM_ORDER_ID + "," + COL_ORDER_ITEM_BOOK_ID + "," +
+                COL_ORDER_ITEM_QUANTITY + "," + COL_ORDER_ITEM_PRICE
+                + ") VALUES (1,1,2,120000)");
     }
 
     @Override
@@ -223,10 +233,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_CART);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_BOOK);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_CATEGORY);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_ORDER_ITEM);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_ORDER);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_USER);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_ORDER);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_ORDER_ITEM);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_REVIEW);
+
         onCreate(db);
     }
 

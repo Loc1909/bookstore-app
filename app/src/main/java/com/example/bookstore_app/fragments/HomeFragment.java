@@ -16,7 +16,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.bookstore_app.activities.BookDetailActivity;
 import com.example.bookstore_app.R;
-import com.example.bookstore_app.activities.BookDetailActivity;
 import com.example.bookstore_app.activities.CartActivity;
 import com.example.bookstore_app.adapters.BookAdapter;
 import com.example.bookstore_app.database.dao.BookDAO;
@@ -37,7 +36,6 @@ public class HomeFragment extends Fragment {
     private SessionManager sessionManager;
 
     private RecyclerView recyclerView;
-    private BookAdapter adapter;
     private RecyclerView recyclerBooks, recyclerFeatured;
     private SearchView searchView;
     private ImageView ivCart;
@@ -76,10 +74,7 @@ public class HomeFragment extends Fragment {
         recyclerFeatured = view.findViewById(R.id.recyclerFeatured);
         searchView = view.findViewById(R.id.searchView);
         ivCart = view.findViewById(R.id.ivCart);
-        ivCart.setOnClickListener(v -> {
-            Intent intent = new Intent(getActivity(), CartActivity.class);
-            startActivity(intent);
-        });
+
         sessionManager = new SessionManager(requireContext());
         currentUserId = sessionManager.getUserId();
 
@@ -99,36 +94,6 @@ public class HomeFragment extends Fragment {
         setupBooksRecycler();
         setupFeaturedRecycler();
 
-        adapter = new BookAdapter(bookList, new BookAdapter.OnBookActionListener() {
-
-            @Override
-            public void onBookClick(Book book) {
-                Intent intent = new Intent(getContext(), BookDetailActivity.class);
-                intent.putExtra("book_id", book.getId());
-                startActivity(intent);
-            }
-
-
-            @Override
-            public void onEdit(Book book) {
-            }
-
-            @Override
-            public void onDelete(Book book) {
-            }
-
-            @Override
-            public void onAddToCart(Book book) {
-                cartDAO.addToCart(currentUserId, book, 1);
-                Toast.makeText(getContext(), "Đã thêm vào giỏ", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onBuyNow(Book book) {
-            }
-        }, false);
-
-        recyclerView.setAdapter(adapter);
         loadCategoryChips();
         loadFirstBooks();
         loadFeatured();
