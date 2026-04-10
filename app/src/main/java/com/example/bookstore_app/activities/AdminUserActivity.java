@@ -11,7 +11,6 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -21,6 +20,7 @@ import com.example.bookstore_app.database.dao.UserDAO;
 import com.example.bookstore_app.models.User;
 import com.example.bookstore_app.utils.SessionManager;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,7 +45,6 @@ public class AdminUserActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_admin_user);
 
-        TextView tvUserCount = findViewById(R.id.tvUserCount);
         View btnBack = findViewById(R.id.btnBack);
         btnBack.setOnClickListener(v -> finish());
 
@@ -59,7 +58,8 @@ public class AdminUserActivity extends AppCompatActivity {
         EditText etSearchUser = findViewById(R.id.etSearchUser);
         etSearchUser.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -67,7 +67,8 @@ public class AdminUserActivity extends AppCompatActivity {
             }
 
             @Override
-            public void afterTextChanged(Editable s) {}
+            public void afterTextChanged(Editable s) {
+            }
         });
 
         adapter = new UserAdapter(userList, new UserAdapter.OnUserClickListener() {
@@ -94,7 +95,6 @@ public class AdminUserActivity extends AppCompatActivity {
         fullUserList.clear();
         fullUserList.addAll(userDAO.getAllUsers());
 
-        // Apply current filter
         EditText etSearchUser = findViewById(R.id.etSearchUser);
         filterUsers(etSearchUser.getText().toString());
     }
@@ -113,7 +113,10 @@ public class AdminUserActivity extends AppCompatActivity {
             }
         }
         adapter.notifyDataSetChanged();
-        ((TextView) findViewById(R.id.tvUserCount)).setText(String.valueOf(userList.size()));
+        TextView tvUserCount = findViewById(R.id.tvUserCount);
+        if (tvUserCount != null) {
+            tvUserCount.setText(String.valueOf(userList.size()));
+        }
     }
 
     private void showUserDialog(User user) {
@@ -123,6 +126,7 @@ public class AdminUserActivity extends AppCompatActivity {
 
         EditText etEmail = view.findViewById(R.id.etEmail);
         EditText etPassword = view.findViewById(R.id.etPassword);
+        TextInputLayout tilPassword = view.findViewById(R.id.tilPassword);
         EditText etFullName = view.findViewById(R.id.etFullName);
         EditText etPhone = view.findViewById(R.id.etPhone);
         EditText etAddress = view.findViewById(R.id.etAddress);
@@ -133,8 +137,12 @@ public class AdminUserActivity extends AppCompatActivity {
         if (user != null) {
             builder.setTitle("Edit User");
             etEmail.setText(user.getEmail());
-            etEmail.setEnabled(false); // Email identifier usually cannot be changed easily
-            etPassword.setHint("Leave blank to keep current");
+            etEmail.setEnabled(false);
+
+            tilPassword.setHint(getString(R.string.password));
+            tilPassword.setHelperText(getString(R.string.leave_blank_password));
+            tilPassword.setHelperTextEnabled(true);
+
             etFullName.setText(user.getFullName());
             etPhone.setText(user.getPhone());
             etAddress.setText(user.getAddress());
@@ -146,6 +154,9 @@ public class AdminUserActivity extends AppCompatActivity {
             }
         } else {
             builder.setTitle("Add User");
+            tilPassword.setHint(getString(R.string.password));
+            tilPassword.setHelperText(null);
+            tilPassword.setHelperTextEnabled(false);
         }
 
         builder.setPositiveButton("Save", null);
@@ -161,7 +172,6 @@ public class AdminUserActivity extends AppCompatActivity {
             String address = etAddress.getText().toString().trim();
             String role = rbAdmin.isChecked() ? "admin" : "user";
 
-            // Email validation
             if (email.isEmpty()) {
                 etEmail.setError("Email is required");
                 return;
@@ -171,7 +181,6 @@ public class AdminUserActivity extends AppCompatActivity {
                 return;
             }
 
-            // Password validation
             if (user == null && password.isEmpty()) {
                 etPassword.setError("Password is required for new users");
                 return;
@@ -181,13 +190,11 @@ public class AdminUserActivity extends AppCompatActivity {
                 return;
             }
 
-            // Full Name validation
             if (fullName.isEmpty()) {
                 etFullName.setError("Full name is required");
                 return;
             }
 
-            // Phone validation - simple check for digits and length
             if (!phone.isEmpty() && !phone.matches("\\d{10,11}")) {
                 etPhone.setError("Invalid phone number (10-11 digits needed)");
                 return;
@@ -196,7 +203,6 @@ public class AdminUserActivity extends AppCompatActivity {
             dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
 
             if (user == null) {
-                // Add
                 User newUser = new User();
                 newUser.setEmail(email);
                 newUser.setPassword(password);
@@ -210,12 +216,10 @@ public class AdminUserActivity extends AppCompatActivity {
                     loadUsers();
                     dialog.dismiss();
                 } else {
-                    Toast.makeText(AdminUserActivity.this, "Failed to add (Email may already exist)",
-                            Toast.LENGTH_SHORT).show();
+                    Toast.makeText(AdminUserActivity.this, "Failed to add", Toast.LENGTH_SHORT).show();
                     dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
                 }
             } else {
-                // Edit
                 user.setFullName(fullName);
                 user.setPhone(phone);
                 user.setAddress(address);
