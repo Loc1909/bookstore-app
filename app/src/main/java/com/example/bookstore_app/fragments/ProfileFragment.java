@@ -64,7 +64,6 @@ public class ProfileFragment extends Fragment {
     private void loadUser() {
         User user = sessionManager.getUser();
         if (user == null) return;
-
         txtUserName.setText(user.getFullName());
         txtUserEmail.setText(user.getEmail());
 

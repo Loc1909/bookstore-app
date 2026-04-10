@@ -50,6 +50,25 @@ public class CategoryDAO {
         db.close();
         return result != -1;
     }
+    public String getNameById(int id) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        String name = "";
+
+        Cursor cursor = db.rawQuery(
+                "SELECT name FROM " + DatabaseHelper.TABLE_CATEGORY + " WHERE id = ?",
+                new String[]{String.valueOf(id)}
+        );
+
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                name = cursor.getString(cursor.getColumnIndexOrThrow("name"));
+            }
+            cursor.close();
+        }
+
+        return name;
+    }
 
     public boolean updateCategory(Category category) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();

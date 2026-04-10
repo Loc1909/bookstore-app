@@ -54,6 +54,10 @@ public class AdminBookActivity extends AppCompatActivity {
         adapter = new BookAdapter(
                 new ArrayList<>(),
                 new BookAdapter.OnBookActionListener() {
+                    @Override
+                    public void onBuyNow(Book book) {
+                        // admin không dùng
+                    }
 
                     @Override
                     public void onBookClick(Book book) {

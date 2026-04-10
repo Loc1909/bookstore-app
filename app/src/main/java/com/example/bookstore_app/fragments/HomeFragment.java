@@ -15,45 +15,46 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.bookstore_app.R;
+import com.example.bookstore_app.activities.BookDetailActivity;
 import com.example.bookstore_app.activities.CartActivity;
 import com.example.bookstore_app.adapters.BookAdapter;
 import com.example.bookstore_app.database.dao.BookDAO;
 import com.example.bookstore_app.database.dao.CartDAO;
+import com.example.bookstore_app.database.dao.CategoryDAO;
 import com.example.bookstore_app.models.Book;
+import com.example.bookstore_app.models.Category;
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
 
 import java.util.ArrayList;
 import java.util.List;
-import com.google.android.material.chip.Chip;
-import com.google.android.material.chip.ChipGroup;
-import com.example.bookstore_app.database.dao.CategoryDAO;
-import com.example.bookstore_app.models.Category;
 
 public class HomeFragment extends Fragment {
 
     private RecyclerView recyclerBooks, recyclerFeatured;
     private SearchView searchView;
     private ImageView ivCart;
-
     private ChipGroup chipGroupCategories;
-    private int currentCategoryId = -1; // -1 = tất cả
 
     private BookAdapter adapterBooks, adapterFeatured;
     private BookDAO bookDAO;
     private CartDAO cartDAO;
 
-    private List<Book> bookList = new ArrayList<>();
-    private List<Book> featuredList = new ArrayList<>();
+    // ===== DATA SEPARATION =====
+    private final List<Book> bookList = new ArrayList<>();         // ALL BOOKS (paging)
+    private final List<Book> featuredList = new ArrayList<>();     // FILTERED BOOKS
 
+    // ===== FILTER STATE (ONLY FEATURED) =====
+    private int currentCategoryId = -1;
     private String currentKeyword = "";
 
-    // ===== PAGINATION =====
+    // ===== PAGINATION (ONLY BOOKS) =====
     private final int limit = 5;
     private int offset = 0;
     private boolean isLoading = false;
     private boolean isLastPage = false;
 
-    // debounce
-    private Handler handler = new Handler();
+    private final Handler handler = new Handler();
     private Runnable searchRunnable;
 
     public HomeFragment() {
@@ -70,27 +71,45 @@ public class HomeFragment extends Fragment {
         ivCart = view.findViewById(R.id.ivCart);
         chipGroupCategories = view.findViewById(R.id.chipGroupCategories);
 
-// Load category chips
-        loadCategoryChips();
+        bookDAO = new BookDAO(getContext());
+        cartDAO = new CartDAO(getContext());
 
         ivCart.setOnClickListener(v ->
                 startActivity(new Intent(getActivity(), CartActivity.class))
         );
 
-        bookDAO = new BookDAO(getContext());
-        cartDAO = new CartDAO(getContext());
+        setupBooksRecycler();
+        setupFeaturedRecycler();
 
-        // ===== RECYCLER BOOKS =====
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
-        recyclerBooks.setLayoutManager(layoutManager);
+        loadCategoryChips();
+
+        loadFirstBooks();      // 👈 ONLY BOOKS
+        loadFeatured();        // 👈 ONLY FEATURED
+
+        setupSearch();
+    }
+
+    // ================= BOOKS (PAGING - ALWAYS ALL BOOKS) =================
+
+    private void setupBooksRecycler() {
+        LinearLayoutManager lm = new LinearLayoutManager(getContext());
+        recyclerBooks.setLayoutManager(lm);
 
         adapterBooks = new BookAdapter(
                 bookList,
                 new BookAdapter.OnBookActionListener() {
-                    @Override public void onBookClick(Book book) {}
 
+                    @Override
+                    public void onBuyNow(Book book) {
+                        // xử lý sau này
+                    }
+                    @Override
+                    public void onBookClick(Book book) {
+                        Intent intent = new Intent(getContext(), BookDetailActivity.class);
+                        intent.putExtra("book_id", book.getId());
+                        startActivity(intent);
+                    }
                     @Override public void onEdit(Book book) {}
-
                     @Override public void onDelete(Book book) {}
 
                     @Override
@@ -105,21 +124,70 @@ public class HomeFragment extends Fragment {
 
         recyclerBooks.setAdapter(adapterBooks);
 
-        // ===== LOAD MORE =====
         recyclerBooks.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(@NonNull RecyclerView rv, int dx, int dy) {
-
-                int total = layoutManager.getItemCount();
-                int last = layoutManager.findLastVisibleItemPosition();
+                int total = lm.getItemCount();
+                int last = lm.findLastVisibleItemPosition();
 
                 if (!isLoading && !isLastPage && last >= total - 2) {
-                    loadMore();
+                    loadMoreBooks();
                 }
             }
         });
+    }
 
-        // ===== FEATURED =====
+    private void loadFirstBooks() {
+        offset = 0;
+        isLastPage = false;
+        isLoading = false;
+
+        bookList.clear();
+
+        List<Book> data = bookDAO.getBooksPaging(limit, offset);
+
+        if (data != null && !data.isEmpty()) {
+            bookList.addAll(data);
+            offset += limit;
+        } else {
+            isLastPage = true;
+        }
+
+        adapterBooks.notifyDataSetChanged();
+    }
+
+    private void loadMoreBooks() {
+        if (isLoading || isLastPage) return;
+
+        isLoading = true;
+
+        bookList.add(null);
+        adapterBooks.notifyItemInserted(bookList.size() - 1);
+
+        new Handler().postDelayed(() -> {
+
+            int pos = bookList.size() - 1;
+            bookList.remove(pos);
+            adapterBooks.notifyItemRemoved(pos);
+
+            List<Book> data = bookDAO.getBooksPaging(limit, offset);
+
+            if (data == null || data.isEmpty()) {
+                isLastPage = true;
+            } else {
+                bookList.addAll(data);
+                offset += limit;
+                adapterBooks.notifyDataSetChanged();
+            }
+
+            isLoading = false;
+
+        }, 500);
+    }
+
+    // ================= FEATURED (FILTER ONLY - NO PAGING) =================
+
+    private void setupFeaturedRecycler() {
         recyclerFeatured.setLayoutManager(
                 new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false)
         );
@@ -127,10 +195,18 @@ public class HomeFragment extends Fragment {
         adapterFeatured = new BookAdapter(
                 featuredList,
                 new BookAdapter.OnBookActionListener() {
-                    @Override public void onBookClick(Book book) {}
 
+                    @Override
+                    public void onBuyNow(Book book) {
+                        // theem sau này
+                    }
+                    @Override
+                    public void onBookClick(Book book) {
+                        Intent intent = new Intent(getContext(), BookDetailActivity.class);
+                        intent.putExtra("book_id", book.getId());
+                        startActivity(intent);
+                    }
                     @Override public void onEdit(Book book) {}
-
                     @Override public void onDelete(Book book) {}
 
                     @Override
@@ -144,153 +220,77 @@ public class HomeFragment extends Fragment {
         );
 
         recyclerFeatured.setAdapter(adapterFeatured);
-
-        loadFirstPage();
-        setupSearch();
     }
+
+    private void loadFeatured() {
+        featuredList.clear();
+        featuredList.addAll(getFilteredBooks());
+        adapterFeatured.notifyDataSetChanged();
+    }
+
+    private List<Book> getFilteredBooks() {
+
+        String keyword = currentKeyword == null ? "" : currentKeyword.trim();
+
+        if (currentCategoryId == -1) {
+            if (keyword.isEmpty()) {
+                return bookDAO.getBooksPaging(10, 0);
+            } else {
+                return bookDAO.searchBooks(keyword, 10, 0);
+            }
+        } else {
+            return bookDAO.getBooksByCategory(currentCategoryId, keyword, 10, 0);
+        }
+    }
+
+    // ================= CATEGORY =================
 
     private void loadCategoryChips() {
         chipGroupCategories.removeAllViews();
 
-        // Chip "Tất cả"
-        Chip chipAll = new Chip(getContext());
-        chipAll.setText("Tất cả");
-        chipAll.setCheckable(true);
-        chipAll.setChecked(currentCategoryId == -1);
-        chipAll.setOnClickListener(v -> {
-            currentCategoryId = -1;
-            loadFirstPage();
-            updateChipSelection(chipAll);
-        });
-        chipGroupCategories.addView(chipAll);
+        Chip all = new Chip(getContext());
+        all.setText("Tất cả");
+        all.setCheckable(true);
+        all.setChecked(true);
 
-        // Load categories từ database
+        all.setOnClickListener(v -> {
+            currentCategoryId = -1;
+            currentKeyword = "";
+            searchView.setQuery("", false);
+
+            loadFeatured();
+        });
+
+        chipGroupCategories.addView(all);
+
         List<Category> categories = new CategoryDAO(getContext()).getAllCategories();
 
-        for (Category cat : categories) {
+        for (Category c : categories) {
             Chip chip = new Chip(getContext());
-            chip.setText(cat.getName());
+            chip.setText(c.getName());
             chip.setCheckable(true);
-            chip.setChecked(cat.getId() == currentCategoryId);
 
             chip.setOnClickListener(v -> {
-                currentCategoryId = cat.getId();
-                loadFirstPage();
-                updateChipSelection(chip);
+                currentCategoryId = c.getId();
+                currentKeyword = "";
+                searchView.setQuery("", false);
+
+                loadFeatured();
             });
 
             chipGroupCategories.addView(chip);
         }
     }
 
-    private void updateChipSelection(Chip selectedChip) {
-        int count = chipGroupCategories.getChildCount();
-        for (int i = 0; i < count; i++) {
-            View v = chipGroupCategories.getChildAt(i);
-            if (v instanceof Chip) {
-                ((Chip) v).setChecked(v == selectedChip);
-            }
-        }
-    }
+    // ================= SEARCH (ONLY FEATURED) =================
 
-    // ===== LOAD FIRST =====
-    private void loadFirstPage() {
-        offset = 0;
-        isLastPage = false;
-        bookList.clear();
-
-        List<Book> newBooks = getData();
-
-        if (newBooks != null && !newBooks.isEmpty()) {
-            bookList.addAll(newBooks);
-        } else {
-            isLastPage = true;
-        }
-
-        adapterBooks.notifyDataSetChanged();
-        offset += limit;
-
-        updateFeatured();
-    }
-
-    // ===== LOAD MORE =====
-    private void loadMore() {
-
-        if (isLoading || isLastPage) return;
-
-        isLoading = true;
-
-        // add loading
-        bookList.add(null);
-        adapterBooks.notifyItemInserted(bookList.size() - 1);
-
-        new Handler().postDelayed(() -> {
-
-            int pos = bookList.size() - 1;
-            if (pos >= 0) {
-                bookList.remove(pos);
-                adapterBooks.notifyItemRemoved(pos);
-            }
-
-            List<Book> newBooks = getData();
-
-            if (newBooks == null || newBooks.isEmpty()) {
-                isLastPage = true;
-            } else {
-                bookList.addAll(newBooks);
-                adapterBooks.notifyDataSetChanged();
-                offset += limit;
-            }
-
-            isLoading = false;
-
-        }, 800);
-    }
-
-    // ===== DATA SOURCE =====
-    private List<Book> getData() {
-
-        String keyword = currentKeyword == null ? "" : currentKeyword.trim();
-
-        if (currentCategoryId == -1) {
-            // không lọc category
-            if (keyword.isEmpty()) {
-                return bookDAO.getBooksPaging(limit, offset);
-            } else {
-                return bookDAO.searchBooks(keyword, limit, offset);
-            }
-        } else {
-            // có lọc category
-            return bookDAO.getBooksByCategory(
-                    currentCategoryId,
-                    keyword,
-                    limit,
-                    offset
-            );
-        }
-    }
-
-    // ===== FEATURED =====
-    private void updateFeatured() {
-        featuredList.clear();
-
-        for (int i = 0; i < Math.min(limit, bookList.size()); i++) {
-            if (bookList.get(i) != null) {
-                featuredList.add(bookList.get(i));
-            }
-        }
-
-        adapterFeatured.notifyDataSetChanged();
-    }
-
-    // ===== SEARCH =====
     private void setupSearch() {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 
             @Override
             public boolean onQueryTextSubmit(String query) {
                 currentKeyword = query.trim();
-                loadFirstPage();
+                loadFeatured();
                 return true;
             }
 
@@ -301,10 +301,10 @@ public class HomeFragment extends Fragment {
 
                 searchRunnable = () -> {
                     currentKeyword = newText.trim();
-                    loadFirstPage();
+                    loadFeatured();
                 };
 
-                handler.postDelayed(searchRunnable, 400);
+                handler.postDelayed(searchRunnable, 300);
 
                 return true;
             }
