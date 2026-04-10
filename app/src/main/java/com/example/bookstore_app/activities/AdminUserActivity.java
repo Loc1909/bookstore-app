@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
@@ -23,6 +24,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.List;
+import android.text.Editable;
+import android.text.TextWatcher;
 
 public class AdminUserActivity extends AppCompatActivity {
 
@@ -30,6 +33,7 @@ public class AdminUserActivity extends AppCompatActivity {
     private FloatingActionButton fabAddUser;
     private UserAdapter adapter;
     private List<User> userList;
+    private List<User> fullUserList;
     private UserDAO userDAO;
     private SessionManager sessionManager;
 
@@ -37,28 +41,34 @@ public class AdminUserActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Safety check logic like AdminDashboardActivity
         sessionManager = new SessionManager(this);
-        // if (!sessionManager.isLoggedIn() || !sessionManager.isAdmin()) {
-        //     Toast.makeText(this, "You don't have permission to access this area", Toast.LENGTH_LONG).show();
-        //     finish();
-        //     return;
-        // }
 
         setContentView(R.layout.activity_admin_user);
 
-        Toolbar toolbar = findViewById(R.id.toolbarUser);
-        setSupportActionBar(toolbar);
-        if(getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        }
-        toolbar.setNavigationOnClickListener(v -> onBackPressed());
+        TextView tvUserCount = findViewById(R.id.tvUserCount);
+        View btnBack = findViewById(R.id.btnBack);
+        btnBack.setOnClickListener(v -> finish());
 
         rvUsers = findViewById(R.id.rvUsers);
         fabAddUser = findViewById(R.id.fabAddUser);
 
         userDAO = new UserDAO(this);
         userList = new ArrayList<>();
+        fullUserList = new ArrayList<>();
+
+        EditText etSearchUser = findViewById(R.id.etSearchUser);
+        etSearchUser.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                filterUsers(s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
 
         adapter = new UserAdapter(userList, new UserAdapter.OnUserClickListener() {
             @Override
@@ -81,9 +91,29 @@ public class AdminUserActivity extends AppCompatActivity {
     }
 
     private void loadUsers() {
+        fullUserList.clear();
+        fullUserList.addAll(userDAO.getAllUsers());
+
+        // Apply current filter
+        EditText etSearchUser = findViewById(R.id.etSearchUser);
+        filterUsers(etSearchUser.getText().toString());
+    }
+
+    private void filterUsers(String query) {
         userList.clear();
-        userList.addAll(userDAO.getAllUsers());
+        if (query.isEmpty()) {
+            userList.addAll(fullUserList);
+        } else {
+            String lowerQuery = query.toLowerCase().trim();
+            for (User user : fullUserList) {
+                if (user.getFullName().toLowerCase().contains(lowerQuery) ||
+                        user.getEmail().toLowerCase().contains(lowerQuery)) {
+                    userList.add(user);
+                }
+            }
+        }
         adapter.notifyDataSetChanged();
+        ((TextView) findViewById(R.id.tvUserCount)).setText(String.valueOf(userList.size()));
     }
 
     private void showUserDialog(User user) {
@@ -118,7 +148,12 @@ public class AdminUserActivity extends AppCompatActivity {
             builder.setTitle("Add User");
         }
 
-        builder.setPositiveButton("Save", (dialog, which) -> {
+        builder.setPositiveButton("Save", null);
+        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
             String email = etEmail.getText().toString().trim();
             String password = etPassword.getText().toString().trim();
             String fullName = etFullName.getText().toString().trim();
@@ -126,10 +161,39 @@ public class AdminUserActivity extends AppCompatActivity {
             String address = etAddress.getText().toString().trim();
             String role = rbAdmin.isChecked() ? "admin" : "user";
 
-            if (email.isEmpty() || (user == null && password.isEmpty())) {
-                Toast.makeText(AdminUserActivity.this, "Email and Password are required", Toast.LENGTH_SHORT).show();
+            // Email validation
+            if (email.isEmpty()) {
+                etEmail.setError("Email is required");
                 return;
             }
+            if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                etEmail.setError("Invalid email format");
+                return;
+            }
+
+            // Password validation
+            if (user == null && password.isEmpty()) {
+                etPassword.setError("Password is required for new users");
+                return;
+            }
+            if (!password.isEmpty() && password.length() < 6) {
+                etPassword.setError("Password must be at least 6 characters");
+                return;
+            }
+
+            // Full Name validation
+            if (fullName.isEmpty()) {
+                etFullName.setError("Full name is required");
+                return;
+            }
+
+            // Phone validation - simple check for digits and length
+            if (!phone.isEmpty() && !phone.matches("\\d{10,11}")) {
+                etPhone.setError("Invalid phone number (10-11 digits needed)");
+                return;
+            }
+
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
 
             if (user == null) {
                 // Add
@@ -144,8 +208,11 @@ public class AdminUserActivity extends AppCompatActivity {
                 if (userDAO.register(newUser)) {
                     Toast.makeText(AdminUserActivity.this, "Added successfully", Toast.LENGTH_SHORT).show();
                     loadUsers();
+                    dialog.dismiss();
                 } else {
-                    Toast.makeText(AdminUserActivity.this, "Failed to add (Email may already exist)", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(AdminUserActivity.this, "Failed to add (Email may already exist)",
+                            Toast.LENGTH_SHORT).show();
+                    dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
                 }
             } else {
                 // Edit
@@ -158,21 +225,18 @@ public class AdminUserActivity extends AppCompatActivity {
                 }
 
                 if (userDAO.updateUser(user)) {
-                    // Update session if editing self
                     if (sessionManager.getUserId() == user.getId()) {
                         sessionManager.updateUserData(user);
                     }
                     Toast.makeText(AdminUserActivity.this, "Updated successfully", Toast.LENGTH_SHORT).show();
                     loadUsers();
+                    dialog.dismiss();
                 } else {
                     Toast.makeText(AdminUserActivity.this, "Failed to update", Toast.LENGTH_SHORT).show();
+                    dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
                 }
             }
         });
-
-        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
-        AlertDialog dialog = builder.create();
-        dialog.show();
     }
 
     private void confirmDeleteUser(User user) {

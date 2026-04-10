@@ -151,7 +151,32 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 ") VALUES ('admin@gmail.com','123','Admin','admin'," + now + ")");
         db.execSQL("INSERT INTO " + TABLE_USER + "(" +
                 COL_EMAIL + "," + COL_PASSWORD + "," + COL_FULL_NAME + "," + COL_ROLE + "," + COL_CREATED_AT +
+                ") VALUES ('admin1@gmail.com','123','Admin1','admin'," + now + ")");
+        db.execSQL("INSERT INTO " + TABLE_USER + "(" +
+                COL_EMAIL + "," + COL_PASSWORD + "," + COL_FULL_NAME + "," + COL_ROLE + "," + COL_CREATED_AT +
+                ") VALUES ('admin2@gmail.com','123','Admin2','admin'," + now + ")");
+        db.execSQL("INSERT INTO " + TABLE_USER + "(" +
+                COL_EMAIL + "," + COL_PASSWORD + "," + COL_FULL_NAME + "," + COL_ROLE + "," + COL_CREATED_AT +
+                ") VALUES ('admin3@gmail.com','123','Admin3','admin'," + now + ")");
+        db.execSQL("INSERT INTO " + TABLE_USER + "(" +
+                COL_EMAIL + "," + COL_PASSWORD + "," + COL_FULL_NAME + "," + COL_ROLE + "," + COL_CREATED_AT +
+                ") VALUES ('admin4@gmail.com','123','Admin4','admin'," + now + ")");
+        db.execSQL("INSERT INTO " + TABLE_USER + "(" +
+                COL_EMAIL + "," + COL_PASSWORD + "," + COL_FULL_NAME + "," + COL_ROLE + "," + COL_CREATED_AT +
+                ") VALUES ('admin5@gmail.com','123','Admin5','admin'," + now + ")");
+
+        db.execSQL("INSERT INTO " + TABLE_USER + "(" +
+                COL_EMAIL + "," + COL_PASSWORD + "," + COL_FULL_NAME + "," + COL_ROLE + "," + COL_CREATED_AT +
                 ") VALUES ('user@gmail.com','123','User','user'," + now + ")");
+        db.execSQL("INSERT INTO " + TABLE_USER + "(" +
+                COL_EMAIL + "," + COL_PASSWORD + "," + COL_FULL_NAME + "," + COL_PHONE +  "," + COL_ADDRESS + "," + COL_ROLE + "," + COL_CREATED_AT +
+                ") VALUES ('user1@example.com', '123456', 'Nguyễn Văn A', '0987654321', 'Hà Nội', 'user'," + now + ")");
+        db.execSQL("INSERT INTO " + TABLE_USER + "(" +
+                COL_EMAIL + "," + COL_PASSWORD + "," + COL_FULL_NAME + "," + COL_PHONE +  "," + COL_ADDRESS + "," + COL_ROLE + "," + COL_CREATED_AT +
+                ") VALUES ('user2@example.com', '123456', 'Nguyễn Văn B', '0123456784', 'Đà Lạt', 'user'," + now + ")");
+        db.execSQL("INSERT INTO " + TABLE_USER + "(" +
+                COL_EMAIL + "," + COL_PASSWORD + "," + COL_FULL_NAME + "," + COL_PHONE +  "," + COL_ADDRESS + "," + COL_ROLE + "," + COL_CREATED_AT +
+                ") VALUES ('user3@example.com', '123456', 'Nguyễn Văn C', '0984345435', 'TP.HCM', 'user'," + now + ")");
 
         // ORDER
         db.execSQL("INSERT INTO " + TABLE_ORDER + "(" +
@@ -167,8 +192,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         if (oldVersion < 13) {
+            boolean hasCart = isTableExists(db, "cart");
             // 1. Rename old cart table
-            db.execSQL("ALTER TABLE cart RENAME TO cart_old");
+            if (hasCart) {
+                db.execSQL("ALTER TABLE cart RENAME TO cart_old");
+            }
 
             // 2. Create new cart table
             db.execSQL("CREATE TABLE cart (" +
@@ -178,12 +206,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     "price REAL, " +
                     "quantity INTEGER)");
 
-            // 3. Copy data
-            db.execSQL("INSERT INTO cart (id, bookId, title, price, quantity) " +
-                    "SELECT id, bookId, title, price, quantity FROM cart_old");
+            if (isTableExists(db, "cart_old")) {
+                // 3. Copy data
+                db.execSQL("INSERT INTO cart (id, bookId, title, price, quantity) " +
+                        "SELECT id, bookId, title, price, quantity FROM cart_old");
 
-            // 4. Drop old table
-            db.execSQL("DROP TABLE cart_old");
+                // 4. Drop old table
+                db.execSQL("DROP TABLE cart_old");
+            }
         }
     }
 
@@ -198,6 +228,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 break;
             }
         }
+        cursor.close();
+        return exists;
+    }
+
+    private boolean isTableExists(SQLiteDatabase db, String tableName) {
+        Cursor cursor = db.rawQuery(
+                "SELECT name FROM sqlite_master WHERE type='table' AND name=?",
+                new String[]{tableName}
+        );
+
+        boolean exists = cursor.getCount() > 0;
         cursor.close();
         return exists;
     }
