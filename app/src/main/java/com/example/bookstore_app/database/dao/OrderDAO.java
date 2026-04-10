@@ -2,6 +2,7 @@ package com.example.bookstore_app.database.dao;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.example.bookstore_app.database.DatabaseHelper;
@@ -45,5 +46,34 @@ public class OrderDAO {
 
         db.close();
         return orderId;
+    }
+    public boolean hasUserBoughtBook(int userId, int bookId) {
+
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        String query = "SELECT COUNT(*) " +
+                "FROM orders o " +
+                "JOIN order_items od ON o.id = od.order_id " +
+                "WHERE o.user_id = ? " +
+                "AND od.book_id = ? " +
+                "AND o.status = ?";
+
+        Cursor cursor = db.rawQuery(query, new String[]{
+                String.valueOf(userId),
+                String.valueOf(bookId),
+                "COMPLETED" // chỉ tính đơn đã hoàn thành
+        });
+
+        boolean result = false;
+
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                int count = cursor.getInt(0);
+                result = count > 0;
+            }
+            cursor.close();
+        }
+
+        return result;
     }
 }

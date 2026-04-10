@@ -4,121 +4,136 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.Filter;
-import android.widget.Filterable;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.bookstore_app.R;
 import com.example.bookstore_app.models.Book;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
-public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder> implements Filterable {
+public class BookAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
+    public static final int TYPE_HORIZONTAL = 0;
+    public static final int TYPE_VERTICAL = 1;
+
+    private static final int VIEW_TYPE_BOOK = 0;
+    private static final int VIEW_TYPE_LOADING = 1;
+
+    private int layoutType;
     private List<Book> bookList;
-    private List<Book> bookListFull;
     private OnBookActionListener listener;
     private boolean isAdmin;
 
+    public BookAdapter(List<Book> bookList, OnBookActionListener listener, boolean isAdmin, int layoutType) {
+        this.bookList = (bookList != null) ? bookList : new ArrayList<>();
+        this.listener = listener;
+        this.isAdmin = isAdmin;
+        this.layoutType = layoutType;
+    }
     public BookAdapter(List<Book> bookList, OnBookActionListener listener, boolean isAdmin) {
-
-        this.bookList = new ArrayList<>(bookList);
-        this.bookListFull = new ArrayList<>(bookList);
+        this.bookList = (bookList != null) ? bookList : new ArrayList<>();
         this.listener = listener;
         this.isAdmin = isAdmin;
     }
 
+    @Override
+    public int getItemViewType(int position) {
+        return bookList.get(position) == null ? VIEW_TYPE_LOADING : VIEW_TYPE_BOOK;
+    }
+
     @NonNull
     @Override
-    public BookViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+
+        if (viewType == VIEW_TYPE_LOADING) {
+            View view = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.item_loading, parent, false);
+            return new LoadingViewHolder(view);
+        }
+
+        int layoutId = (layoutType == TYPE_VERTICAL)
+                ? R.layout.item_book_vertical
+                : R.layout.item_book;
 
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_book, parent, false);
+                .inflate(layoutId, parent, false);
 
         return new BookViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull BookViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+
+        if (holder instanceof LoadingViewHolder) return;
 
         Book book = bookList.get(position);
+        BookViewHolder h = (BookViewHolder) holder;
 
-        holder.txtTitle.setText(book.getTitle());
-        holder.txtAuthor.setText(book.getAuthor());
-        holder.txtPrice.setText(String.format("%,.0fđ", book.getPrice()));
+        if (book == null) return;
 
-        if (book.getImageUrl() != null && !book.getImageUrl().isEmpty()) {
+        h.txtTitle.setText(book.getTitle());
+        h.txtAuthor.setText(book.getAuthor());
 
-            Glide.with(holder.itemView.getContext())
-                    .load(book.getImageUrl())
-                    .placeholder(R.drawable.ic_launcher_background)
-                    .into(holder.imgBook);
 
-        } else {
+        NumberFormat formatter = NumberFormat.getInstance(new Locale("vi", "VN"));
+        h.txtPrice.setText(formatter.format(book.getPrice()) + " đ");
 
-            holder.imgBook.setImageResource(R.drawable.ic_launcher_background);
-        }
+        // load ảnh an toàn
+        Glide.with(h.itemView.getContext())
+                .load(book.getImageUrl())
+                .placeholder(R.drawable.ic_launcher_background)
+                .error(R.drawable.ic_launcher_background)
+                .into(h.imgBook);
 
+        // ===== ROLE =====
         if (!isAdmin) {
-            holder.btnEditBook.setVisibility(View.GONE);
-            holder.btnDeleteBook.setVisibility(View.GONE);
+            if (h.btnEditBook != null) h.btnEditBook.setVisibility(View.GONE);
+            if (h.btnDeleteBook != null) h.btnDeleteBook.setVisibility(View.GONE);
         } else {
-            holder.btnAddToCart.setVisibility(View.GONE);
+            if (h.btnAddToCart != null) h.btnAddToCart.setVisibility(View.GONE);
         }
 
-        // Click item
-        holder.itemView.setOnClickListener(v -> {
-
-            int pos = holder.getAdapterPosition();
-
-            if (listener != null && pos != RecyclerView.NO_POSITION) {
-                listener.onBookClick(bookList.get(pos));
-            }
+        // ===== CLICK =====
+        h.itemView.setOnClickListener(v -> {
+            if (listener != null) listener.onBookClick(book);
         });
 
-        // Edit book
-        holder.btnEditBook.setOnClickListener(v -> {
+        if (h.btnAddToCart != null) {
+            h.btnAddToCart.setOnClickListener(v -> {
+                if (listener != null) listener.onAddToCart(book);
+            });
+        }
 
-            int pos = holder.getAdapterPosition();
+        if (h.btnEditBook != null) {
+            h.btnEditBook.setOnClickListener(v -> {
+                if (listener != null) listener.onEdit(book);
+            });
+        }
 
-            if (listener != null && pos != RecyclerView.NO_POSITION) {
-                listener.onEdit(bookList.get(pos));
-            }
-        });
-
-        // Delete book
-        holder.btnDeleteBook.setOnClickListener(v -> {
-
-            int pos = holder.getAdapterPosition();
-
-            if (listener != null && pos != RecyclerView.NO_POSITION) {
-                listener.onDelete(bookList.get(pos));
-            }
-        });
-
-        //Add book to cart
-        holder.btnAddToCart.setOnClickListener(v -> {
-            if (listener != null) {
-                listener.onAddToCart(book);
-            }
-        });
+        if (h.btnDeleteBook != null) {
+            h.btnDeleteBook.setOnClickListener(v -> {
+                if (listener != null) listener.onDelete(book);
+            });
+        }
     }
 
     @Override
     public int getItemCount() {
-        return bookList.size();
+        return bookList == null ? 0 : bookList.size();
     }
 
+    // ===== VIEW HOLDER =====
     static class BookViewHolder extends RecyclerView.ViewHolder {
-
         TextView txtTitle, txtAuthor, txtPrice;
         ImageView imgBook;
         ImageButton btnEditBook, btnDeleteBook, btnAddToCart;
@@ -137,74 +152,62 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
         }
     }
 
-    // Update RecyclerView data
-    public void updateData(List<Book> newList) {
-
-        bookList.clear();
-        bookList.addAll(newList);
-
-        bookListFull.clear();
-        bookListFull.addAll(newList);
-
-        notifyDataSetChanged();
+    static class LoadingViewHolder extends RecyclerView.ViewHolder {
+        public LoadingViewHolder(@NonNull View itemView) {
+            super(itemView);
+        }
     }
 
+    // ===== INTERFACE =====
     public interface OnBookActionListener {
-
         void onBookClick(Book book);
-
         void onEdit(Book book);
-
         void onDelete(Book book);
-
         void onAddToCart(Book book);
+
+
+        void onBuyNow(Book book);
     }
 
-    // SEARCH FILTER
+    // ===== UPDATE DATA (DIFFUTIL) =====
+    public void updateData(List<Book> newList) {
+        if (newList == null) newList = new ArrayList<>();
 
-    @Override
-    public Filter getFilter() {
-        return bookFilter;
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffCallback(this.bookList, newList));
+        this.bookList.clear();
+        this.bookList.addAll(newList);
+        diffResult.dispatchUpdatesTo(this);
     }
 
-    private Filter bookFilter = new Filter() {
+    static class DiffCallback extends DiffUtil.Callback {
 
-        @Override
-        protected FilterResults performFiltering(CharSequence constraint) {
+        private final List<Book> oldList;
+        private final List<Book> newList;
 
-            List<Book> filteredList = new ArrayList<>();
-
-            if (constraint == null || constraint.length() == 0) {
-
-                filteredList.addAll(bookListFull);
-
-            } else {
-
-                String filterPattern = constraint.toString().toLowerCase().trim();
-
-                for (Book book : bookListFull) {
-
-                    if (book.getTitle().toLowerCase().contains(filterPattern)
-                            || book.getAuthor().toLowerCase().contains(filterPattern)) {
-
-                        filteredList.add(book);
-                    }
-                }
-            }
-
-            FilterResults results = new FilterResults();
-            results.values = filteredList;
-
-            return results;
+        public DiffCallback(List<Book> oldList, List<Book> newList) {
+            this.oldList = oldList;
+            this.newList = newList;
         }
 
         @Override
-        protected void publishResults(CharSequence constraint, FilterResults results) {
-
-            bookList.clear();
-            bookList.addAll((List<Book>) results.values);
-
-            notifyDataSetChanged();
+        public int getOldListSize() {
+            return oldList.size();
         }
-    };
+
+        @Override
+        public int getNewListSize() {
+            return newList.size();
+        }
+
+        @Override
+        public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+            return oldList.get(oldItemPosition).getId() ==
+                    newList.get(newItemPosition).getId();
+        }
+
+        @Override
+        public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+            return oldList.get(oldItemPosition).equals(newList.get(newItemPosition));
+        }
+    }
 }

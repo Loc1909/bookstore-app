@@ -19,18 +19,18 @@ public class CategoryDAO {
         dbHelper = new DatabaseHelper(context);
     }
 
-    public List<Category> getAllCategories(){
+    public List<Category> getAllCategories() {
         List<Category> list = new ArrayList<>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
         Cursor cursor = db.rawQuery("SELECT * FROM " + DatabaseHelper.TABLE_CATEGORY, null);
 
-        if(cursor != null && cursor.moveToFirst()){
-            do{
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
                 int id = cursor.getInt(cursor.getColumnIndexOrThrow("id"));
                 String name = cursor.getString(cursor.getColumnIndexOrThrow("name"));
                 list.add(new Category(id, name));
-            } while(cursor.moveToNext());
+            } while (cursor.moveToNext());
 
             cursor.close();
         }
@@ -69,6 +69,25 @@ public class CategoryDAO {
 
         db.close();
         return result != -1;
+    }
+    public String getNameById(int id) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        String name = "";
+
+        Cursor cursor = db.rawQuery(
+                "SELECT name FROM " + DatabaseHelper.TABLE_CATEGORY + " WHERE id = ?",
+                new String[]{String.valueOf(id)}
+        );
+
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                name = cursor.getString(cursor.getColumnIndexOrThrow("name"));
+            }
+            cursor.close();
+        }
+
+        return name;
     }
 
     public boolean updateCategory(Category category) {

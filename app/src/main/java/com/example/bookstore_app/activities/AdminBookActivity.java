@@ -24,94 +24,116 @@ import java.util.List;
 
 public class AdminBookActivity extends AppCompatActivity {
 
-    RecyclerView recyclerView;
-    EditText searchView; // đổi từ SearchView -> EditText
-    FloatingActionButton btnAddBook;
-    TextView tvBookCount;
+    private RecyclerView recyclerView;
+    private EditText searchView;
+    private FloatingActionButton btnAddBook;
+    private TextView tvBookCount;
+    private ImageButton btnBack;
 
-    BookAdapter adapter;
-    BookDAO bookDAO;
+    private BookAdapter adapter;
+    private BookDAO bookDAO;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_admin_books); // FIX tên xml
+        setContentView(R.layout.activity_admin_books);
 
-        // Ánh xạ view
+        // ===== Bind view =====
         recyclerView = findViewById(R.id.recyclerViewBooks);
         searchView = findViewById(R.id.searchView);
         btnAddBook = findViewById(R.id.btnAddBook);
         tvBookCount = findViewById(R.id.tvBookCount);
+        btnBack = findViewById(R.id.btnBack);
 
-        ImageButton btnBack = findViewById(R.id.btnBack);
-
+        // ===== DAO =====
         bookDAO = new BookDAO(this);
 
+        // ===== RecyclerView =====
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        // Back
-        btnBack.setOnClickListener(v -> finish());
+        adapter = new BookAdapter(
+                new ArrayList<>(),
+                new BookAdapter.OnBookActionListener() {
+                    @Override
+                    public void onBuyNow(Book book) {
+                        // admin không dùng
+                    }
 
-        // Adapter
-        adapter = new BookAdapter(new ArrayList<>(), new BookAdapter.OnBookActionListener() {
+                    @Override
+                    public void onBookClick(Book book) {
+                        // có thể mở detail nếu cần
+                    }
 
-            @Override
-            public void onBookClick(Book book) {
-                // TODO: mở chi tiết nếu cần
-            }
+                    @Override
+                    public void onEdit(Book book) {
+                        Intent intent = new Intent(AdminBookActivity.this, EditBookActivity.class);
 
-            @Override
-            public void onEdit(Book book) {
-                Intent intent = new Intent(AdminBookActivity.this, EditBookActivity.class);
+                        intent.putExtra("id", book.getId());
+                        intent.putExtra("title", book.getTitle());
+                        intent.putExtra("author", book.getAuthor());
+                        intent.putExtra("price", book.getPrice());
+                        intent.putExtra("categoryId", book.getCategoryId());
+                        intent.putExtra("image", book.getImageUrl());
 
-                intent.putExtra("id", book.getId());
-                intent.putExtra("title", book.getTitle());
-                intent.putExtra("author", book.getAuthor());
-                intent.putExtra("price", book.getPrice());
-                intent.putExtra("categoryId", book.getCategoryId());
-                intent.putExtra("image", book.getImageUrl());
+                        startActivity(intent);
+                    }
 
-                startActivity(intent);
-            }
+                    @Override
+                    public void onDelete(Book book) {
+                        new AlertDialog.Builder(AdminBookActivity.this)
+                                .setTitle("Delete Book")
+                                .setMessage("Are you sure you want to delete this book?")
+                                .setPositiveButton("Delete", (dialog, which) -> {
+                                    bookDAO.deleteBook(book.getId());
+                                    loadBooks();
+                                })
+                                .setNegativeButton("Cancel", null)
+                                .show();
+                    }
 
-            @Override
-            public void onDelete(Book book) {
-                new AlertDialog.Builder(AdminBookActivity.this)
-                        .setTitle("Delete Book")
-                        .setMessage("Are you sure you want to delete this book?")
-                        .setPositiveButton("Delete", (dialog, which) -> {
-                            bookDAO.deleteBook(book.getId());
-                            loadBooks();
-                        })
-                        .setNegativeButton("Cancel", null)
-                        .show();
-            }
+                    @Override
+                    public void onAddToCart(Book book) {
+                        // admin không dùng
+                    }
 
-            @Override
-            public void onAddToCart(Book book) {
-
-            }
-
-        }, true);
+                },
+                true, // isAdmin
+                BookAdapter.TYPE_HORIZONTAL
+        );
 
         recyclerView.setAdapter(adapter);
 
-        // Load data
+        // ===== Load data =====
         loadBooks();
 
-        // Add book
+        // ===== Back =====
+        btnBack.setOnClickListener(v -> finish());
+
+        // ===== Add book =====
         btnAddBook.setOnClickListener(v ->
                 startActivity(new Intent(AdminBookActivity.this, AddBookActivity.class))
         );
 
-        // SEARCH với EditText
+        // ===== Search =====
         searchView.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                adapter.getFilter().filter(s.toString());
+
+                String keyword = s.toString().trim();
+
+                List<Book> books;
+
+                if (keyword.isEmpty()) {
+                    books = bookDAO.getAllBooks();
+                } else {
+                    books = bookDAO.searchBooksAdmin(keyword);
+                }
+
+                adapter.updateData(books);
+                tvBookCount.setText(String.valueOf(books.size()));
             }
 
             @Override
@@ -119,13 +141,13 @@ public class AdminBookActivity extends AppCompatActivity {
         });
     }
 
-    // Load danh sách sách
+    // ===== Load books =====
     private void loadBooks() {
         List<Book> books = bookDAO.getAllBooks();
 
         adapter.updateData(books);
 
-        // Update số lượng sách
+        // update số lượng
         tvBookCount.setText(String.valueOf(books.size()));
     }
 

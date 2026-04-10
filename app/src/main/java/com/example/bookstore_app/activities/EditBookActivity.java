@@ -17,6 +17,10 @@ import com.example.bookstore_app.database.dao.CategoryDAO;
 import com.example.bookstore_app.models.Book;
 import com.example.bookstore_app.models.Category;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,18 +30,15 @@ public class EditBookActivity extends AppCompatActivity {
     Spinner spinnerCategory;
     Button btnUpdate;
     ImageView imgBook;
-
     ImageButton btnBack;
     FrameLayout imgPickerArea;
     LinearLayout imgPlaceholder;
 
     BookDAO bookDAO;
     CategoryDAO categoryDAO;
-
     List<Category> categoryList;
 
     int bookId;
-    int currentCategoryId;
     String imagePath = "";
 
     ActivityResultLauncher<Intent> imagePickerLauncher;
@@ -56,6 +57,7 @@ public class EditBookActivity extends AppCompatActivity {
         imgPickerArea = findViewById(R.id.imgPickerArea);
         imgPlaceholder = findViewById(R.id.imgPlaceholder);
         btnBack = findViewById(R.id.btnBack);
+
         bookDAO = new BookDAO(this);
         categoryDAO = new CategoryDAO(this);
 
@@ -68,10 +70,8 @@ public class EditBookActivity extends AppCompatActivity {
                     if (result.getResultCode() == RESULT_OK && result.getData() != null) {
                         Uri uri = result.getData().getData();
                         if (uri != null) {
-                            imagePath = uri.toString();
-
+                            imagePath = saveImageToInternalStorage(uri);
                             Glide.with(this).load(uri).into(imgBook);
-
                             imgBook.setVisibility(ImageView.VISIBLE);
                             imgPlaceholder.setVisibility(LinearLayout.GONE);
                         }
@@ -79,28 +79,21 @@ public class EditBookActivity extends AppCompatActivity {
                 }
         );
 
-        // Get data
+        // Lấy dữ liệu sách từ intent
         Intent intent = getIntent();
-
         bookId = intent.getIntExtra("id", -1);
-        currentCategoryId = intent.getIntExtra("categoryId", -1);
-        imagePath = intent.getStringExtra("image");
-
         edtTitle.setText(intent.getStringExtra("title"));
         edtAuthor.setText(intent.getStringExtra("author"));
         edtPrice.setText(String.valueOf(intent.getDoubleExtra("price", 0)));
-
-        setSpinnerSelection();
-
-        // Load image cũ
-        if (imagePath != null && !imagePath.isEmpty()) {
+        imagePath = intent.getStringExtra("image");
+        if (!TextUtils.isEmpty(imagePath)) {
             Glide.with(this).load(imagePath).into(imgBook);
-
             imgBook.setVisibility(ImageView.VISIBLE);
             imgPlaceholder.setVisibility(LinearLayout.GONE);
         }
 
-        // Click chọn ảnh
+        setSpinnerSelection(intent.getIntExtra("categoryId", -1));
+
         imgPickerArea.setOnClickListener(v -> {
             Intent pick = new Intent(Intent.ACTION_PICK);
             pick.setType("image/*");
@@ -108,29 +101,21 @@ public class EditBookActivity extends AppCompatActivity {
         });
 
         btnUpdate.setOnClickListener(v -> updateBook());
-        btnBack.setOnClickListener( v -> finish());
+        btnBack.setOnClickListener(v -> finish());
     }
 
     private void loadCategories() {
         categoryList = categoryDAO.getAllCategories();
-
         List<String> names = new ArrayList<>();
-        for (Category c : categoryList) {
-            names.add(c.getName());
-        }
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                this,
-                android.R.layout.simple_spinner_dropdown_item,
-                names
-        );
-
+        for (Category c : categoryList) names.add(c.getName());
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_spinner_dropdown_item, names);
         spinnerCategory.setAdapter(adapter);
     }
 
-    private void setSpinnerSelection() {
+    private void setSpinnerSelection(int categoryId) {
         for (int i = 0; i < categoryList.size(); i++) {
-            if (categoryList.get(i).getId() == currentCategoryId) {
+            if (categoryList.get(i).getId() == categoryId) {
                 spinnerCategory.setSelection(i);
                 break;
             }
@@ -138,15 +123,11 @@ public class EditBookActivity extends AppCompatActivity {
     }
 
     private void updateBook() {
-
         String title = edtTitle.getText().toString().trim();
         String author = edtAuthor.getText().toString().trim();
         String priceText = edtPrice.getText().toString().trim();
 
-        if (TextUtils.isEmpty(title) ||
-                TextUtils.isEmpty(author) ||
-                TextUtils.isEmpty(priceText)) {
-
+        if (TextUtils.isEmpty(title) || TextUtils.isEmpty(author) || TextUtils.isEmpty(priceText)) {
             Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -159,9 +140,7 @@ public class EditBookActivity extends AppCompatActivity {
             return;
         }
 
-        int categoryId = categoryList
-                .get(spinnerCategory.getSelectedItemPosition())
-                .getId();
+        int categoryId = categoryList.get(spinnerCategory.getSelectedItemPosition()).getId();
 
         Book book = new Book();
         book.setId(bookId);
@@ -171,9 +150,25 @@ public class EditBookActivity extends AppCompatActivity {
         book.setCategoryId(categoryId);
         book.setImageUrl(imagePath);
 
-        bookDAO.updateBook(book);
+        boolean success = bookDAO.updateBook(book);
+        Toast.makeText(this, success ? "Book updated successfully" : "Update failed", Toast.LENGTH_SHORT).show();
+        if (success) finish();
+    }
 
-        Toast.makeText(this, "Book updated successfully", Toast.LENGTH_SHORT).show();
-        finish();
+    private String saveImageToInternalStorage(Uri uri) {
+        try {
+            InputStream inputStream = getContentResolver().openInputStream(uri);
+            File file = new File(getFilesDir(), "book_" + System.currentTimeMillis() + ".jpg");
+            OutputStream outputStream = new FileOutputStream(file);
+            byte[] buffer = new byte[1024];
+            int length;
+            while ((length = inputStream.read(buffer)) > 0) outputStream.write(buffer, 0, length);
+            inputStream.close();
+            outputStream.close();
+            return file.getAbsolutePath();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }
