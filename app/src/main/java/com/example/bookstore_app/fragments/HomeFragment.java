@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.bookstore_app.activities.BookDetailActivity;
 import com.example.bookstore_app.R;
 import com.example.bookstore_app.activities.CartActivity;
 import com.example.bookstore_app.adapters.BookAdapter;
@@ -70,6 +71,9 @@ public class HomeFragment extends Fragment {
         adapter = new BookAdapter(bookList, new BookAdapter.OnBookActionListener() {
             @Override
             public void onBookClick(Book book) {
+                Intent intent = new Intent(getContext(), BookDetailActivity.class);
+                intent.putExtra("book_id", book.getId());
+                startActivity(intent);
             }
 
             @Override
@@ -82,7 +86,7 @@ public class HomeFragment extends Fragment {
 
             @Override
             public void onAddToCart(Book book) {
-                cartDAO.addToCart(currentUserId,book);
+                cartDAO.addToCart(currentUserId, book, 1);
                 Toast.makeText(getContext(), "Đã thêm vào giỏ", Toast.LENGTH_SHORT).show();
             }
         }, false);

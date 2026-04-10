@@ -3,12 +3,13 @@ package com.example.bookstore_app.adapters;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.bookstore_app.R;
 import com.example.bookstore_app.models.CartItem;
 
@@ -41,9 +42,18 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
         CartItem item = list.get(position);
 
         holder.tvTitle.setText(item.getTitle());
-        // Fix: Convert int to String to avoid Resources$NotFoundException
         holder.tvQuantity.setText(String.valueOf(item.getQuantity()));
-        holder.tvPrice.setText(String.format("%.2f đ", item.getPrice()));
+        holder.tvPrice.setText(String.format("%,.0fđ", item.getPrice()));
+
+        if (item.getImageUrl() != null && !item.getImageUrl().isEmpty()) {
+            Glide.with(holder.itemView.getContext())
+                    .load(item.getImageUrl())
+                    .placeholder(R.drawable.ic_launcher_background)
+                    .into(holder.imgBook);
+        } else {
+            holder.imgBook.setImageResource(R.drawable.ic_launcher_background);
+        }
+
 
         holder.btnPlus.setOnClickListener(v -> {
             listener.onQuantityChanged(item, item.getQuantity() + 1);
@@ -70,6 +80,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
 
     public static class CartViewHolder extends RecyclerView.ViewHolder {
         TextView tvQuantity, tvPrice, tvTitle;
+        ImageView imgBook;
         View btnMinus, btnPlus;
 
         public CartViewHolder(@NonNull View itemView) {
@@ -77,6 +88,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
             tvQuantity = itemView.findViewById(R.id.tvQuantity);
             tvPrice = itemView.findViewById(R.id.tvPrice);
             tvTitle = itemView.findViewById(R.id.tvTitle);
+            imgBook = itemView.findViewById(R.id.imgBook);
             btnMinus = itemView.findViewById(R.id.btnMinus);
             btnPlus = itemView.findViewById(R.id.btnPlus);
         }

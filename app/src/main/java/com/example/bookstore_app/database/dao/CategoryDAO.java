@@ -39,6 +39,26 @@ public class CategoryDAO {
         return list;
     }
 
+    public String getCategoryNameById(int id) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        String name = "Unknown";
+
+        Cursor cursor = db.query(
+                DatabaseHelper.TABLE_CATEGORY,
+                new String[]{"name"},
+                "id=?",
+                new String[]{String.valueOf(id)},
+                null, null, null
+        );
+
+        if (cursor != null && cursor.moveToFirst()) {
+            name = cursor.getString(cursor.getColumnIndexOrThrow("name"));
+            cursor.close();
+        }
+        db.close();
+        return name;
+    }
+
     public boolean addCategory(Category category) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 

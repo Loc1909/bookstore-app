@@ -69,13 +69,6 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent">
 
-                <Button
-                    android:id="@+id/btnBuyNow"
-                    android:layout_width="match_parent"
-                    android:layout_height="36dp"
-                    android:backgroundTint="@color/white"
-                    android:text="Buy Now"
-                    android:textColor="@color/black" />
 
                 <ImageButton
                     android:id="@+id/btnEditBook"

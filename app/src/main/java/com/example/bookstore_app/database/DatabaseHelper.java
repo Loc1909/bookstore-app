@@ -8,7 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "bookstore.db";
-    private static final int DATABASE_VERSION = 11;
+    private static final int DATABASE_VERSION = 13;
 
     // TABLE NAMES
     public static final String TABLE_BOOK = "books";
@@ -25,6 +25,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COL_CART_TITLE = "title";
     public static final String COL_CART_PRICE = "price";
     public static final String COL_CART_QUANTITY = "quantity";
+    public static final String COL_CART_IMAGE = "imageUrl";
 
     // USER COLUMNS
     public static final String COL_USER_ID = "id";
@@ -104,6 +105,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         COL_CART_TITLE + " TEXT, " +
                         COL_CART_PRICE + " REAL, " +
                         COL_CART_QUANTITY + " INTEGER, " +
+                        COL_CART_IMAGE + " TEXT, "+
                         "UNIQUE(" + COL_CART_USER_ID + ", " + COL_CART_BOOK_ID + ")" +
                         ")";
 

@@ -23,7 +23,7 @@ public class CartDAO {
     }
 
     // Thêm vào giỏ
-    public void addToCart(int userId, Book book) {
+    public void addToCart(int userId, Book book, int quantity) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
         Cursor cursor = db.rawQuery(
@@ -33,10 +33,10 @@ public class CartDAO {
         );
 
         if (cursor.moveToFirst()) {
-            int quantity = cursor.getInt(cursor.getColumnIndexOrThrow("quantity"));
+            int cartQuantity = cursor.getInt(cursor.getColumnIndexOrThrow("quantity"));
 
             ContentValues values = new ContentValues();
-            values.put("quantity", quantity + 1);
+            values.put("quantity", cartQuantity + quantity);
 
             db.update("cart", values,
                     "bookId = ? AND userId = ?",
@@ -51,8 +51,8 @@ public class CartDAO {
             values.put("bookId", book.getId());
             values.put("title", book.getTitle());
             values.put("price", book.getPrice());
-            values.put("quantity", 1);
-
+            values.put("quantity", quantity);
+            values.put("imageUrl", book.getImageUrl());
             db.insert("cart", null, values);
         }
 
@@ -93,6 +93,7 @@ public class CartDAO {
             item.title = cursor.getString(cursor.getColumnIndexOrThrow("title"));
             item.price = cursor.getDouble(cursor.getColumnIndexOrThrow("price"));
             item.quantity = cursor.getInt(cursor.getColumnIndexOrThrow("quantity"));
+            item.imageUrl = cursor.getString(cursor.getColumnIndexOrThrow("imageUrl"));
 
             list.add(item);
         }

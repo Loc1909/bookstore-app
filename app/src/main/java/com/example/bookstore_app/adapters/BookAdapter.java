@@ -53,7 +53,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
 
         holder.txtTitle.setText(book.getTitle());
         holder.txtAuthor.setText(book.getAuthor());
-        holder.txtPrice.setText("$" + book.getPrice());
+        holder.txtPrice.setText(String.format("%,.0fđ", book.getPrice()));
 
         if (book.getImageUrl() != null && !book.getImageUrl().isEmpty()) {
 
@@ -71,7 +71,6 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
             holder.btnEditBook.setVisibility(View.GONE);
             holder.btnDeleteBook.setVisibility(View.GONE);
         } else {
-            holder.btnBuyNow.setVisibility(View.GONE);
             holder.btnAddToCart.setVisibility(View.GONE);
         }
 
@@ -122,7 +121,6 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
 
         TextView txtTitle, txtAuthor, txtPrice;
         ImageView imgBook;
-        Button btnBuyNow;
         ImageButton btnEditBook, btnDeleteBook, btnAddToCart;
 
         public BookViewHolder(@NonNull View itemView) {
@@ -136,7 +134,6 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
             btnEditBook = itemView.findViewById(R.id.btnEditBook);
             btnDeleteBook = itemView.findViewById(R.id.btnDeleteBook);
             btnAddToCart = itemView.findViewById(R.id.btnAddToCart);
-            btnBuyNow = itemView.findViewById(R.id.btnBuyNow);
         }
     }
 
