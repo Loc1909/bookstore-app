@@ -2,6 +2,7 @@ package com.example.bookstore_app.models;
 
 public class CartItem {
     public int id;
+    public int userId;
     public int bookId;
     public String title;
     public double price;
@@ -11,8 +12,9 @@ public class CartItem {
     public CartItem() {
     }
 
-    public CartItem(int id, int bookId, String title, double price, int quantity, String imageUrl) {
+    public CartItem(int id, int userId, int bookId, String title, double price, int quantity, String imageUrl) {
         this.id = id;
+        this.userId = userId;
         this.bookId = bookId;
         this.title = title;
         this.price = price;
@@ -59,6 +61,15 @@ public class CartItem {
     public void setQuantity(int quantity) {
         this.quantity = quantity;
     }
+
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+
     public String getImageUrl() {
         return imageUrl;
     }
@@ -66,5 +77,4 @@ public class CartItem {
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
     }
-
 }

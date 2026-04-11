@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.*;
 
+import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -60,6 +61,7 @@ public class BookDetailActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_book_detail);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -255,8 +257,10 @@ public class BookDetailActivity extends AppCompatActivity {
         tvQuantity.setText(String.valueOf(quantity));
 
         btnPlus.setOnClickListener(v -> {
-            quantity++;
-            tvQuantity.setText(String.valueOf(quantity));
+            if (quantity < currentBook.getStock()) {
+                quantity++;
+                tvQuantity.setText(String.valueOf(quantity));
+            }
         });
 
         btnMinus.setOnClickListener(v -> {
@@ -270,18 +274,26 @@ public class BookDetailActivity extends AppCompatActivity {
     private void setupActionButtons() {
 
         btnAddToCart.setOnClickListener(v -> {
-            for (int i = 0; i < quantity; i++) {
-                cartDAO.addToCart(currentBook);
+            SessionManager sessionManager = new SessionManager(this);
+            int userId = sessionManager.getUserId();
+
+            if (userId == -1) {
+                Toast.makeText(this, "Bạn chưa đăng nhập!", Toast.LENGTH_SHORT).show();
+                return;
             }
+
+            CartDAO cartDAO = new CartDAO(this);
+            cartDAO.addToCart(userId, currentBook, quantity);
+
             Toast.makeText(this, "Đã thêm vào giỏ", Toast.LENGTH_SHORT).show();
+            finish();
         });
 
         btnBuyNow.setOnClickListener(v -> {
-            for (int i = 0; i < quantity; i++) {
-                cartDAO.addToCart(currentBook);
-            }
-
-            startActivity(new Intent(this, CartActivity.class));
+            Intent intent = new Intent(this, CheckoutActivity.class);
+            intent.putExtra("book_id", currentBook.getId());
+            intent.putExtra("quantity", quantity);
+            startActivity(intent);
         });
     }
 }

@@ -78,8 +78,6 @@ public class BookAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         h.txtTitle.setText(book.getTitle());
         h.txtAuthor.setText(book.getAuthor());
-
-
         NumberFormat formatter = NumberFormat.getInstance(new Locale("vi", "VN"));
         h.txtPrice.setText(formatter.format(book.getPrice()) + " đ");
 

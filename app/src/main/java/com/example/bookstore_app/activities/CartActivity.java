@@ -1,5 +1,6 @@
 package com.example.bookstore_app.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TextView;
@@ -13,10 +14,13 @@ import com.example.bookstore_app.R;
 import com.example.bookstore_app.adapters.CartAdapter;
 import com.example.bookstore_app.database.dao.CartDAO;
 import com.example.bookstore_app.models.CartItem;
+import com.example.bookstore_app.utils.SessionManager;
 
 import java.util.List;
 
 public class CartActivity extends AppCompatActivity {
+    private int currentUserId;
+    private SessionManager sessionManager;
     RecyclerView recyclerView;
     CartAdapter adapter;
     CartDAO cartDAO;
@@ -29,6 +33,15 @@ public class CartActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cart);
 
+        sessionManager = new SessionManager(this);
+        currentUserId = sessionManager.getUserId();
+
+        if (currentUserId == -1) {
+            Toast.makeText(this, "Vui lòng đăng nhập", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+
         recyclerView = findViewById(R.id.rvCart);
         tvTotal = findViewById(R.id.tvTotalPrice);
         cartDAO = new CartDAO(this);
@@ -39,26 +52,27 @@ public class CartActivity extends AppCompatActivity {
 
         btnCheckout = findViewById(R.id.btnCheckout);
         btnCheckout.setOnClickListener(v -> {
-            if (cartList.isEmpty()) {
+            if (cartList == null || cartList.isEmpty()) {
                 Toast.makeText(this, "Giỏ hàng của bạn trống", Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(this, "Tính năng thanh toán đang phát triển", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(this, CheckoutActivity.class);
+                startActivity(intent);
             }
         });
     }
 
     private void loadCartData() {
-        cartList = cartDAO.getAllCart();
+        cartList = cartDAO.getCartByUser(currentUserId);
         adapter = new CartAdapter(cartList, new CartAdapter.OnCartActionListener() {
             @Override
             public void onQuantityChanged(CartItem item, int newQuantity) {
-                cartDAO.updateQuantity(item.getId(), newQuantity);
-                loadCartData(); // Tải lại dữ liệu và cập nhật UI
+                cartDAO.updateQuantity(currentUserId, item.id, newQuantity);
+                loadCartData();
             }
 
             @Override
             public void onDelete(CartItem item) {
-                cartDAO.deleteItem(item.getId());
+                cartDAO.deleteItem(currentUserId, item.id);
                 loadCartData();
             }
         });
@@ -68,9 +82,11 @@ public class CartActivity extends AppCompatActivity {
 
     private void updateTotal(List<CartItem> list) {
         double total = 0;
-        for (CartItem item : list) {
-            total += item.getPrice() * item.getQuantity();
+        if (list != null) {
+            for (CartItem item : list) {
+                total += item.getPrice() * item.getQuantity();
+            }
         }
-        tvTotal.setText(String.format("Tổng: %.2f đ", total));
+        tvTotal.setText(String.format("Tổng: %,.0f đ", total));
     }
 }

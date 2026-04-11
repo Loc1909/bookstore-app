@@ -23,6 +23,7 @@ import com.example.bookstore_app.database.dao.CartDAO;
 import com.example.bookstore_app.database.dao.CategoryDAO;
 import com.example.bookstore_app.models.Book;
 import com.example.bookstore_app.models.Category;
+import com.example.bookstore_app.utils.SessionManager;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 
@@ -31,6 +32,8 @@ import java.util.List;
 
 public class HomeFragment extends Fragment {
 
+    private int currentUserId;
+    private SessionManager sessionManager;
     private RecyclerView recyclerBooks, recyclerFeatured;
     private SearchView searchView;
     private ImageView ivCart;
@@ -78,13 +81,16 @@ public class HomeFragment extends Fragment {
                 startActivity(new Intent(getActivity(), CartActivity.class))
         );
 
+        sessionManager = new SessionManager(requireContext());
+        currentUserId = sessionManager.getUserId();
+
         setupBooksRecycler();
         setupFeaturedRecycler();
 
         loadCategoryChips();
 
-        loadFirstBooks();      // 👈 ONLY BOOKS
-        loadFeatured();        // 👈 ONLY FEATURED
+        loadFirstBooks();      //  ONLY BOOKS
+        loadFeatured();        //  ONLY FEATURED
 
         setupSearch();
     }
@@ -114,7 +120,7 @@ public class HomeFragment extends Fragment {
 
                     @Override
                     public void onAddToCart(Book book) {
-                        cartDAO.addToCart(book);
+                        cartDAO.addToCart(currentUserId, book, 1);
                         Toast.makeText(getContext(), "Đã thêm vào giỏ", Toast.LENGTH_SHORT).show();
                     }
                 },
@@ -211,7 +217,7 @@ public class HomeFragment extends Fragment {
 
                     @Override
                     public void onAddToCart(Book book) {
-                        cartDAO.addToCart(book);
+                        cartDAO.addToCart(currentUserId, book, 1);
                         Toast.makeText(getContext(), "Đã thêm vào giỏ", Toast.LENGTH_SHORT).show();
                     }
                 },
