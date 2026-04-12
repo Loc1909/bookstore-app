@@ -278,6 +278,7 @@ public class BookDetailActivity extends AppCompatActivity {
         btnBuyNow.setOnClickListener(v -> {
             Intent intent = new Intent(this, CheckoutActivity.class);
             intent.putExtra("book_id", currentBook.getId());
+            intent.putExtra("imageUrl", currentBook.getImageUrl());
             intent.putExtra("quantity", quantity);
             startActivity(intent);
         });

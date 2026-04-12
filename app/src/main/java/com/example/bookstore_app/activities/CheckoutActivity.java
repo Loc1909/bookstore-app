@@ -83,21 +83,23 @@ public class CheckoutActivity extends AppCompatActivity {
     private void prepareData() {
         int bookId = getIntent().getIntExtra("book_id", -1);
         int quantity = getIntent().getIntExtra("quantity", 1);
+        String imageUrl = getIntent().getStringExtra("imageUrl");
 
         if (bookId != -1) {
-            // Mua ngay sp từ BookDetail
             BookDAO bookDAO = new BookDAO(this);
             Book book = bookDAO.getBookById(bookId);
+
             if (book != null) {
                 CartItem item = new CartItem();
                 item.setBookId(book.getId());
                 item.setTitle(book.getTitle());
                 item.setPrice(book.getPrice());
                 item.setQuantity(quantity);
+                item.setImageUrl(imageUrl);
+
                 checkoutList.add(item);
             }
         } else {
-            // Thanh toán toàn bộ giỏ hàng
             CartDAO cartDAO = new CartDAO(this);
             checkoutList.addAll(cartDAO.getCartByUser(currentUserId));
         }
