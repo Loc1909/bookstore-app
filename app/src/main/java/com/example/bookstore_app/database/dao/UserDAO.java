@@ -22,26 +22,40 @@ public class UserDAO {
     // ================= REGISTER =================
     public boolean register(User user) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
+        db.beginTransaction();
 
-        if (isEmailExists(user.getEmail())) {
+        try {
+            if (isEmailExists(user.getEmail())) {
+                db.close();
+                return false;
+            }
+
+            ContentValues values = new ContentValues();
+            values.put(DatabaseHelper.COL_EMAIL, user.getEmail());
+            values.put(DatabaseHelper.COL_PASSWORD, user.getPassword()); // nên hash sau
+            values.put(DatabaseHelper.COL_FULL_NAME, user.getFullName());
+            values.put(DatabaseHelper.COL_PHONE, user.getPhone());
+            values.put(DatabaseHelper.COL_ADDRESS, user.getAddress());
+            values.put(DatabaseHelper.COL_ROLE, user.getRole() != null ? user.getRole() : "user");
+            values.put(DatabaseHelper.COL_AVATAR, user.getAvatar());
+            values.put(DatabaseHelper.COL_CREATED_AT, System.currentTimeMillis());
+
+            long result = db.insert(DatabaseHelper.TABLE_USER, null, values);
+            if (result == -1) {
+                return false;
+            }
+            ContentValues v2 = new ContentValues();
+            v2.put(DatabaseHelper.COL_CART_USER_ID, result);
+            long result2 = db.insert(DatabaseHelper.TABLE_CART, null, v2);
+            if (result2 == -1) {
+                return false;
+            }
+            db.setTransactionSuccessful();
+            return true;
+        }finally {
+            db.endTransaction();
             db.close();
-            return false;
         }
-
-        ContentValues values = new ContentValues();
-        values.put(DatabaseHelper.COL_EMAIL, user.getEmail());
-        values.put(DatabaseHelper.COL_PASSWORD, user.getPassword()); // nên hash sau
-        values.put(DatabaseHelper.COL_FULL_NAME, user.getFullName());
-        values.put(DatabaseHelper.COL_PHONE, user.getPhone());
-        values.put(DatabaseHelper.COL_ADDRESS, user.getAddress());
-        values.put(DatabaseHelper.COL_ROLE, user.getRole() != null ? user.getRole() : "user");
-        values.put(DatabaseHelper.COL_AVATAR, user.getAvatar());
-        values.put(DatabaseHelper.COL_CREATED_AT, System.currentTimeMillis());
-
-        long result = db.insert(DatabaseHelper.TABLE_USER, null, values);
-        db.close();
-
-        return result != -1;
     }
 
     // ================= LOGIN =================

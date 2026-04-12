@@ -20,7 +20,10 @@ import com.example.bookstore_app.models.Book;
 import com.example.bookstore_app.models.CartItem;
 import com.example.bookstore_app.models.User;
 import com.example.bookstore_app.utils.SessionManager;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,6 +40,7 @@ public class CheckoutActivity extends AppCompatActivity {
 
     double subtotal = 0;
     final double SHIPPING_FEE = 30000;
+    private boolean isFromCart = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,27 +85,34 @@ public class CheckoutActivity extends AppCompatActivity {
 
 
     private void prepareData() {
-        int bookId = getIntent().getIntExtra("book_id", -1);
-        int quantity = getIntent().getIntExtra("quantity", 1);
-        String imageUrl = getIntent().getStringExtra("imageUrl");
-
-        if (bookId != -1) {
-            BookDAO bookDAO = new BookDAO(this);
-            Book book = bookDAO.getBookById(bookId);
-
-            if (book != null) {
-                CartItem item = new CartItem();
-                item.setBookId(book.getId());
-                item.setTitle(book.getTitle());
-                item.setPrice(book.getPrice());
-                item.setQuantity(quantity);
-                item.setImageUrl(imageUrl);
-
-                checkoutList.add(item);
+        String jsonItems = getIntent().getStringExtra("selected_items");
+        if (jsonItems != null && !jsonItems.isEmpty()) {
+            isFromCart = true;
+            Gson gson = new Gson();
+            Type type = new TypeToken<List<CartItem>>(){}.getType();
+            List<CartItem> items = gson.fromJson(jsonItems, type);
+            if (items != null) {
+                checkoutList.addAll(items);
             }
         } else {
-            CartDAO cartDAO = new CartDAO(this);
-            checkoutList.addAll(cartDAO.getCartByUser(currentUserId));
+            int bookId = getIntent().getIntExtra("book_id", -1);
+            int quantity = getIntent().getIntExtra("quantity", 1);
+            String imageUrl = getIntent().getStringExtra("imageUrl");
+
+            if (bookId != -1) {
+                BookDAO bookDAO = new BookDAO(this);
+                Book book = bookDAO.getBookById(bookId);
+
+                if (book != null) {
+                    CartItem item = new CartItem();
+                    item.setBookId(book.getId());
+                    item.setTitle(book.getTitle());
+                    item.setPrice(book.getPrice());
+                    item.setQuantity(quantity);
+                    item.setImageUrl(imageUrl);
+                    checkoutList.add(item);
+                }
+            }
         }
     }
 
@@ -123,21 +134,21 @@ public class CheckoutActivity extends AppCompatActivity {
             return;
         }
 
-
         OrderDAO orderDAO = new OrderDAO(this);
         long result = orderDAO.createOrder(currentUserId, checkoutList, subtotal + SHIPPING_FEE);
         if (result != -1) {
             Toast.makeText(this, "Đặt hàng thành công!", Toast.LENGTH_LONG).show();
 
-            if (getIntent().getIntExtra("book_id", -1) == -1) {
+            if (isFromCart) {
                 CartDAO cartDAO = new CartDAO(this);
-                cartDAO.clearCart(currentUserId);
+                for (CartItem item : checkoutList) {
+                    cartDAO.deleteItem(item.getId());
+                }
             }
 
             Intent intent = new Intent(this, MainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
-
             finish();
         } else {
             Toast.makeText(this, "Có lỗi xảy ra khi đặt hàng", Toast.LENGTH_SHORT).show();

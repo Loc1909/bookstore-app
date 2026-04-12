@@ -13,6 +13,7 @@ import com.bumptech.glide.Glide;
 import com.example.bookstore_app.R;
 import com.example.bookstore_app.models.CartItem;
 
+import java.io.File;
 import java.util.List;
 
 public class CheckoutAdapter extends RecyclerView.Adapter<CheckoutAdapter.ViewHolder> {
@@ -37,14 +38,23 @@ public class CheckoutAdapter extends RecyclerView.Adapter<CheckoutAdapter.ViewHo
         holder.tvQuantity.setText("Số lượng: " + item.getQuantity());
         holder.tvPrice.setText(String.format("%,.0f đ", item.getPrice()));
         
-
-        if (item.getImageUrl() != null && !item.getImageUrl().isEmpty()) {
-            Glide.with(holder.itemView.getContext())
-                    .load(item.getImageUrl())
-                    .placeholder(R.drawable.ic_launcher_background)
-                    .into(holder.ivBook);
+        String imageUrl = item.getImageUrl();
+        if (imageUrl != null && !imageUrl.isEmpty()) {
+            if (imageUrl.startsWith("http")) {
+                Glide.with(holder.itemView.getContext())
+                        .load(imageUrl)
+                        .placeholder(R.drawable.ic_image_picker)
+                        .error(R.drawable.ic_image_picker)
+                        .into(holder.ivBook);
+            } else {
+                Glide.with(holder.itemView.getContext())
+                        .load(new File(imageUrl))
+                        .placeholder(R.drawable.ic_image_picker)
+                        .error(R.drawable.ic_image_picker)
+                        .into(holder.ivBook);
+            }
         } else {
-            holder.ivBook.setImageResource(R.drawable.ic_launcher_background);
+            holder.ivBook.setImageResource(R.drawable.ic_image_picker);
         }
     }
 

@@ -15,7 +15,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:gravity="center_vertical"
         android:padding="12dp">
+
+        <CheckBox
+            android:id="@+id/cbSelected"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:buttonTint="@color/gold_primary" />
 
         <!-- IMAGE -->
         <ImageView
@@ -80,7 +87,8 @@
                     android:layout_height="30dp"
                     android:src="@drawable/ic_minus"
                     android:padding="6dp"
-                    android:background="@drawable/bg_circle"                    android:clickable="true"
+                    android:background="@drawable/bg_circle"
+                    android:clickable="true"
                     android:focusable="true"
                     android:foreground="?attr/selectableItemBackgroundBorderless"
                     app:tint="@color/gold_primary"/>
@@ -100,7 +108,8 @@
                     android:layout_height="30dp"
                     android:src="@drawable/ic_plus"
                     android:padding="6dp"
-                    android:background="@drawable/bg_circle"                    android:clickable="true"
+                    android:background="@drawable/bg_circle"
+                    android:clickable="true"
                     android:focusable="true"
                     android:foreground="?attr/selectableItemBackgroundBorderless"
                     app:tint="@color/gold_primary"/>

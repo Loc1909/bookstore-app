@@ -3,6 +3,7 @@ package com.example.bookstore_app.adapters;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -24,6 +25,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
     public interface OnCartActionListener {
         void onQuantityChanged(CartItem item, int newQuantity);
         void onDelete(CartItem item);
+        void onSelectionChanged();
     }
 
     public CartAdapter(List<CartItem> list, OnCartActionListener listener) {
@@ -46,6 +48,13 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
         holder.tvTitle.setText(item.getTitle());
         holder.tvQuantity.setText(String.valueOf(item.getQuantity()));
         holder.tvPrice.setText(String.format("%,.0fđ", item.getPrice()));
+        
+        holder.cbSelected.setOnCheckedChangeListener(null);
+        holder.cbSelected.setChecked(item.isSelected());
+        holder.cbSelected.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            item.setSelected(isChecked);
+            listener.onSelectionChanged();
+        });
 
         String imageUrl = item.getImageUrl();
 
@@ -79,8 +88,6 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
         holder.btnMinus.setOnClickListener(v -> {
             if (item.getQuantity() > 1) {
                 listener.onQuantityChanged(item, item.getQuantity() - 1);
-            } else {
-                listener.onDelete(item);
             }
         });
 
@@ -96,6 +103,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
     public static class CartViewHolder extends RecyclerView.ViewHolder {
         TextView tvQuantity, tvPrice, tvTitle;
         ImageView imgBook;
+        CheckBox cbSelected;
         View btnMinus, btnPlus, btnDelete;
 
         public CartViewHolder(@NonNull View itemView) {
@@ -104,6 +112,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
             tvPrice = itemView.findViewById(R.id.tvPrice);
             tvTitle = itemView.findViewById(R.id.tvTitle);
             imgBook = itemView.findViewById(R.id.imgBook);
+            cbSelected = itemView.findViewById(R.id.cbSelected);
             btnMinus = itemView.findViewById(R.id.btnMinus);
             btnPlus = itemView.findViewById(R.id.btnPlus);
             btnDelete = itemView.findViewById(R.id.btnDelete);
