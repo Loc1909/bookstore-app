@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.SearchView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -28,19 +29,21 @@ import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.SimpleTimeZone;
+import java.util.TimeZone;
 
 public class HomeFragment extends Fragment {
 
     private int currentUserId;
     private SessionManager sessionManager;
-
     private RecyclerView recyclerView;
     private RecyclerView recyclerBooks, recyclerFeatured;
     private SearchView searchView;
     private ImageView ivCart;
+    private TextView txtGreeting;
     private ChipGroup chipGroupCategories;
-
     private BookAdapter adapterBooks, adapterFeatured;
     private BookDAO bookDAO;
     private CartDAO cartDAO;
@@ -74,7 +77,7 @@ public class HomeFragment extends Fragment {
         recyclerFeatured = view.findViewById(R.id.recyclerFeatured);
         searchView = view.findViewById(R.id.searchView);
         ivCart = view.findViewById(R.id.ivCart);
-
+        txtGreeting = view.findViewById(R.id.txtGreeting);
         sessionManager = new SessionManager(requireContext());
         currentUserId = sessionManager.getUserId();
 
@@ -91,14 +94,27 @@ public class HomeFragment extends Fragment {
                 startActivity(new Intent(getActivity(), CartActivity.class))
         );
 
+        txtGreeting.setText(getGreeting());
+
         setupBooksRecycler();
         setupFeaturedRecycler();
-
         loadCategoryChips();
         loadFirstBooks();
         loadFeatured();
-
         setupSearch();
+    }
+
+    private String getGreeting() {
+        Calendar calendar = Calendar.getInstance();
+        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+
+        if (hour >= 5 && hour < 12) {
+            return "Chào buổi sáng ☀️";
+        } else if (hour >= 12 && hour < 18) {
+            return "Chào buổi chiều 🌤️";
+        } else {
+            return "Chào buổi tối 🌙";
+        }
     }
 
     // ================= BOOKS (PAGING - ALWAYS ALL BOOKS) =================

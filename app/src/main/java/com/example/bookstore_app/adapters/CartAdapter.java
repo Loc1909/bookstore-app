@@ -47,28 +47,34 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
         holder.tvQuantity.setText(String.valueOf(item.getQuantity()));
         holder.tvPrice.setText(String.format("%,.0fđ", item.getPrice()));
 
-        if (item.getImageUrl() != null && !item.getImageUrl().isEmpty()) {
-            Glide.with(holder.itemView.getContext())
-                    .load(item.getImageUrl())
-                    .placeholder(R.drawable.ic_launcher_background)
-                    .into(holder.imgBook);
-        } else {
-            holder.imgBook.setImageResource(R.drawable.ic_launcher_background);
-        }
+        String imageUrl = item.getImageUrl();
 
+        // ===== FIX ẢNH =====
+        if (imageUrl != null && !imageUrl.isEmpty()) {
 
-        // Hiển thị ảnh sách
-        if (item.getImageUrl() != null && !item.getImageUrl().isEmpty()) {
-            File imageFile = new File(item.getImageUrl());
-            Glide.with(holder.itemView.getContext())
-                    .load(imageFile)
-                    .placeholder(R.drawable.ic_image_picker)
-                    .into(holder.imgBook);
+            if (imageUrl.startsWith("http")) {
+                // Ảnh online
+                Glide.with(holder.itemView.getContext())
+                        .load(imageUrl)
+                        .placeholder(R.drawable.ic_image_picker)
+                        .error(R.drawable.ic_image_picker)
+                        .into(holder.imgBook);
+
+            } else {
+                // Ảnh local file
+                Glide.with(holder.itemView.getContext())
+                        .load(new File(imageUrl))
+                        .placeholder(R.drawable.ic_image_picker)
+                        .error(R.drawable.ic_image_picker)
+                        .into(holder.imgBook);
+            }
+
         } else {
             holder.imgBook.setImageResource(R.drawable.ic_image_picker);
         }
 
-        holder.btnPlus.setOnClickListener(v -> listener.onQuantityChanged(item, item.getQuantity() + 1));
+        holder.btnPlus.setOnClickListener(v ->
+                listener.onQuantityChanged(item, item.getQuantity() + 1));
 
         holder.btnMinus.setOnClickListener(v -> {
             if (item.getQuantity() > 1) {
@@ -78,7 +84,8 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
             }
         });
 
-        holder.btnDelete.setOnClickListener(v -> listener.onDelete(item));
+        holder.btnDelete.setOnClickListener(v ->
+                listener.onDelete(item));
     }
 
     @Override

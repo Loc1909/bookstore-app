@@ -6,9 +6,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -49,7 +47,6 @@ public class CheckoutActivity extends AppCompatActivity {
         currentUserId = sessionManager.getUserId();
 
         initViews();
-        setupToolbar();
         prepareData();
 
         adapter = new CheckoutAdapter(checkoutList);
@@ -82,14 +79,6 @@ public class CheckoutActivity extends AppCompatActivity {
         }
     }
 
-    private void setupToolbar() {
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            toolbar.setNavigationOnClickListener(v -> finish());
-        }
-    }
 
     private void prepareData() {
         int bookId = getIntent().getIntExtra("book_id", -1);

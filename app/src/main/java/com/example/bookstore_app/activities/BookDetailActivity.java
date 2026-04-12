@@ -38,8 +38,8 @@ import java.util.List;
 import java.util.Locale;
 
 public class BookDetailActivity extends AppCompatActivity {
-    private ImageView ivBookImage, btnMinus, btnPlus, imgBook;
-    private TextView tvBookName,tvTitle, tvPrice, tvDescription, tvQuantity, tvStock, tvAuthor, tvCategory;
+    private ImageView btnMinus, btnPlus, imgBook;
+    private TextView tvTitle, tvPrice, tvDescription, tvQuantity, tvStock, tvAuthor, tvCategory;
     private Button btnAddToCart, btnBuyNow;
 
     private RatingBar ratingAvg;
@@ -62,17 +62,6 @@ public class BookDetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_book_detail);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            getWindow().setStatusBarColor(
-                    ContextCompat.getColor(this, R.color.dark_espresso)
-            );
-        }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            getWindow().getDecorView().setSystemUiVisibility(0);
-        }
-
         initView();
         initData();
     }
@@ -84,6 +73,7 @@ public class BookDetailActivity extends AppCompatActivity {
         tvCategory = findViewById(R.id.tvCategory);
         tvAuthor = findViewById(R.id.tvAuthor);
         tvStock = findViewById(R.id.tvStock);
+        tvDescription = findViewById(R.id.tvDescription);
         ratingAvg = findViewById(R.id.ratingAvg);
         tvRatingAvg = findViewById(R.id.tvRatingAvg);
         tvReviewCount = findViewById(R.id.tvReviewCount);
@@ -137,6 +127,7 @@ public class BookDetailActivity extends AppCompatActivity {
         tvPrice.setText(String.format("%,.0f đ", currentBook.getPrice()));
         String categoryName = categoryDAO.getNameById(currentBook.getCategoryId());
         tvCategory.setText(categoryName);
+        tvDescription.setText(currentBook.getDescription());
         tvAuthor.setText(currentBook.getAuthor());
         tvStock.setText("Còn lại: " + currentBook.getStock() + " cuốn");
         Glide.with(this)
