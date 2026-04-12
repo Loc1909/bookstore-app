@@ -105,6 +105,7 @@ public class CheckoutActivity extends AppCompatActivity {
                 item.setTitle(book.getTitle());
                 item.setPrice(book.getPrice());
                 item.setQuantity(quantity);
+                item.setImageUrl(book.getImageUrl());
                 checkoutList.add(item);
             }
         } else {
@@ -138,8 +139,10 @@ public class CheckoutActivity extends AppCompatActivity {
         if (result != -1) {
             Toast.makeText(this, "Đặt hàng thành công!", Toast.LENGTH_LONG).show();
 
-            CartDAO cartDAO = new CartDAO(this);
-            cartDAO.clearCart(currentUserId);
+            if (getIntent().getIntExtra("book_id", -1) == -1) {
+                CartDAO cartDAO = new CartDAO(this);
+                cartDAO.clearCart(currentUserId);
+            }
 
             Intent intent = new Intent(this, MainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
