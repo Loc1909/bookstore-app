@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.example.bookstore_app.database.DatabaseHelper;
 import com.example.bookstore_app.models.User;
+import com.example.bookstore_app.utils.SessionManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,25 +24,27 @@ public class UserDAO {
     public boolean register(User user) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
-        if (isEmailExists(user.getEmail())) {
+        try {
+            if (isEmailExists(db, user.getEmail())) {
+                return false;
+            }
+
+            ContentValues values = new ContentValues();
+            values.put(DatabaseHelper.COL_EMAIL, user.getEmail());
+            values.put(DatabaseHelper.COL_PASSWORD, user.getPassword());
+            values.put(DatabaseHelper.COL_FULL_NAME, user.getFullName());
+            values.put(DatabaseHelper.COL_PHONE, user.getPhone());
+            values.put(DatabaseHelper.COL_ADDRESS, user.getAddress());
+            values.put(DatabaseHelper.COL_ROLE, user.getRole() != null ? user.getRole() : "user");
+            values.put(DatabaseHelper.COL_CREATED_AT, System.currentTimeMillis());
+
+            long result = db.insert(DatabaseHelper.TABLE_USER, null, values);
+
+            return result != -1;
+
+        } finally {
             db.close();
-            return false;
         }
-
-        ContentValues values = new ContentValues();
-        values.put(DatabaseHelper.COL_EMAIL, user.getEmail());
-        values.put(DatabaseHelper.COL_PASSWORD, user.getPassword()); // nên hash sau
-        values.put(DatabaseHelper.COL_FULL_NAME, user.getFullName());
-        values.put(DatabaseHelper.COL_PHONE, user.getPhone());
-        values.put(DatabaseHelper.COL_ADDRESS, user.getAddress());
-        values.put(DatabaseHelper.COL_ROLE, user.getRole() != null ? user.getRole() : "user");
-        values.put(DatabaseHelper.COL_AVATAR, user.getAvatar());
-        values.put(DatabaseHelper.COL_CREATED_AT, System.currentTimeMillis());
-
-        long result = db.insert(DatabaseHelper.TABLE_USER, null, values);
-        db.close();
-
-        return result != -1;
     }
 
     // ================= LOGIN =================
@@ -87,6 +90,7 @@ public class UserDAO {
         return user;
     }
 
+
     // ================= GET BY EMAIL =================
     public User getUserByEmail(String email) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
@@ -109,19 +113,15 @@ public class UserDAO {
     }
 
     // ================= CHECK EMAIL =================
-    public boolean isEmailExists(String email) {
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
-
+    private boolean isEmailExists(SQLiteDatabase db, String email) {
         Cursor cursor = db.rawQuery(
                 "SELECT 1 FROM " + DatabaseHelper.TABLE_USER +
                         " WHERE " + DatabaseHelper.COL_EMAIL + "=? LIMIT 1",
                 new String[]{email}
         );
 
-        boolean exists = cursor != null && cursor.moveToFirst();
-
-        if (cursor != null) cursor.close();
-        db.close();
+        boolean exists = cursor.moveToFirst();
+        cursor.close();
 
         return exists;
     }
@@ -149,6 +149,8 @@ public class UserDAO {
         return list;
     }
 
+
+
     // ================= UPDATE =================
     public boolean updateUser(User user) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -175,6 +177,28 @@ public class UserDAO {
         db.close();
         return result > 0;
     }
+
+
+    public boolean updateAvatar(int userId, String avatarPath) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(DatabaseHelper.COL_AVATAR, avatarPath);
+
+        int result = db.update(
+                DatabaseHelper.TABLE_USER,
+                values,
+                DatabaseHelper.COL_USER_ID + "=?",
+                new String[]{String.valueOf(userId)}
+        );
+
+        db.close();
+        return result > 0;
+    }
+
+
+
+
 
     // ================= DELETE =================
     public boolean deleteUser(int id) {
@@ -220,4 +244,5 @@ public class UserDAO {
 
         return user;
     }
+
 }

@@ -67,15 +67,28 @@
                 android:layout_marginTop="16dp"
                 android:layout_marginBottom="24dp">
 
-                <ImageView
-                    android:id="@+id/imgAvatar"
+                <FrameLayout
                     android:layout_width="100dp"
-                    android:layout_height="100dp"
-                    android:src="@drawable/ic_user"
-                    android:contentDescription="Avatar"
-                    android:scaleType="centerCrop"
-                    android:background="@drawable/bg_circle"
-                    android:clipToOutline="true"/>
+                    android:layout_height="100dp">
+
+                    <ImageView
+                        android:id="@+id/imgAvatar"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/ic_user"
+                        android:scaleType="centerCrop"
+                        android:background="@drawable/bg_circle"
+                        android:clipToOutline="true"/>
+
+                    <ImageView
+                        android:id="@+id/btnChangeAvatar"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:layout_gravity="bottom|end"
+                        android:src="@drawable/ic_edit"
+                        android:background="@drawable/bg_circle_small"
+                        android:padding="6dp"/>
+                </FrameLayout>
 
                 <TextView
                     android:id="@+id/txtUserName"
