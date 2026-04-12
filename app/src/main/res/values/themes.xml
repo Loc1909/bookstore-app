@@ -13,8 +13,16 @@
         <item name="android:windowLightStatusBar">false</item>
     </style>
 
-    <!-- App theme -->
-    <style name="Theme.Bookstoreapp" parent="Base.Theme.Bookstoreapp" />
+    <style name="Theme.Bookstoreapp" parent="Theme.Material3.DayNight.NoActionBar">
+
+        <!-- Màu thanh trạng thái -->
+        <item name="android:statusBarColor">@color/black</item>
+
+        <!-- Icon màu sáng (trắng) -->
+        <item name="android:windowLightStatusBar">false</item>
+
+    </style>
+
 
     <!-- Category chip styles -->
     <style name="CategoryChip" parent="Widget.Material3.Chip.Filter">

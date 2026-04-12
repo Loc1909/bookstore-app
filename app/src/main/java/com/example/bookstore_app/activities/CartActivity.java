@@ -67,7 +67,7 @@ public class CartActivity extends AppCompatActivity {
             @Override
             public void onQuantityChanged(CartItem item, int newQuantity) {
                 cartDAO.updateQuantity(currentUserId, item.id, newQuantity);
-                loadCartData(); 
+                loadCartData();
             }
 
             @Override

@@ -2,6 +2,7 @@ package com.example.bookstore_app.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -64,6 +65,7 @@ public class ProfileFragment extends Fragment {
     private void loadUser() {
         User user = sessionManager.getUser();
         if (user == null) return;
+
         txtUserName.setText(user.getFullName());
         txtUserEmail.setText(user.getEmail());
 
@@ -89,10 +91,10 @@ public class ProfileFragment extends Fragment {
             txtMemberSince.setText(sdf.format(new Date(user.getCreatedAt())));
         }
 
-        // ===== Avatar =====
+
         String avatarUrl = user.getAvatar();
         if (avatarUrl != null && !avatarUrl.isEmpty()) {
-            Glide.with(this)
+            Glide.with(requireContext())
                     .load(avatarUrl)
                     .placeholder(R.drawable.ic_user)
                     .error(R.drawable.ic_user)

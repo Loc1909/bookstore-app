@@ -219,7 +219,7 @@ public class BookDAO {
         values.put(DatabaseHelper.COL_CATEGORY_ID_BOOK, book.getCategoryId());
         values.put(DatabaseHelper.COL_DESCRIPTION, book.getDescription());
         values.put(DatabaseHelper.COL_STOCK, book.getStock());
-        values.put(DatabaseHelper.COL_RATING, book.getRating()); // ✅ thêm
+        values.put(DatabaseHelper.COL_RATING, book.getRating());
 
         int rows = db.update(
                 DatabaseHelper.TABLE_BOOK,

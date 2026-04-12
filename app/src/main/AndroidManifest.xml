@@ -39,7 +39,6 @@
 
         <!-- Cart -->
         <activity android:name=".activities.CartActivity" android:exported="false"/>
-
         <activity android:name=".activities.CheckoutActivity" android:exported="false"/>
         <activity android:name=".activities.BookDetailActivity" android:exported="false"/>
 

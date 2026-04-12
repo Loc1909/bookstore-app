@@ -11,6 +11,8 @@
     app:cardBackgroundColor="@color/white"
     app:strokeColor="@color/card_border"
     app:strokeWidth="1dp"
+    android:layout_marginTop="16dp"
+    android:layout_marginBottom="16dp"
     app:rippleColor="@color/gold_muted">
 
     <LinearLayout

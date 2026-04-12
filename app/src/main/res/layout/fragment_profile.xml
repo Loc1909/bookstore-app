@@ -8,7 +8,7 @@
     android:layout_height="match_parent"
     android:background="@color/bg_cream">
 
-    <!-- HEADER giống Home -->
+    <!-- HEADER -->
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -73,8 +73,9 @@
                     android:layout_height="100dp"
                     android:src="@drawable/ic_user"
                     android:contentDescription="Avatar"
-                    android:padding="10dp"
-                    android:background="@null"/>
+                    android:scaleType="centerCrop"
+                    android:background="@drawable/bg_circle"
+                    android:clipToOutline="true"/>
 
                 <TextView
                     android:id="@+id/txtUserName"

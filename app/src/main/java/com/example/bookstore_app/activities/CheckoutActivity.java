@@ -6,9 +6,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -49,7 +47,6 @@ public class CheckoutActivity extends AppCompatActivity {
         currentUserId = sessionManager.getUserId();
 
         initViews();
-        setupToolbar();
         prepareData();
 
         adapter = new CheckoutAdapter(checkoutList);
@@ -82,34 +79,27 @@ public class CheckoutActivity extends AppCompatActivity {
         }
     }
 
-    private void setupToolbar() {
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            toolbar.setNavigationOnClickListener(v -> finish());
-        }
-    }
 
     private void prepareData() {
         int bookId = getIntent().getIntExtra("book_id", -1);
         int quantity = getIntent().getIntExtra("quantity", 1);
+        String imageUrl = getIntent().getStringExtra("imageUrl");
 
         if (bookId != -1) {
-            // Mua ngay sp từ BookDetail
             BookDAO bookDAO = new BookDAO(this);
             Book book = bookDAO.getBookById(bookId);
+
             if (book != null) {
                 CartItem item = new CartItem();
                 item.setBookId(book.getId());
                 item.setTitle(book.getTitle());
                 item.setPrice(book.getPrice());
                 item.setQuantity(quantity);
-                item.setImageUrl(book.getImageUrl());
+                item.setImageUrl(imageUrl);
+
                 checkoutList.add(item);
             }
         } else {
-            // Thanh toán toàn bộ giỏ hàng
             CartDAO cartDAO = new CartDAO(this);
             checkoutList.addAll(cartDAO.getCartByUser(currentUserId));
         }

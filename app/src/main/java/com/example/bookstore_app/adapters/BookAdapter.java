@@ -83,8 +83,6 @@ public class BookAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         h.txtTitle.setText(book.getTitle());
         h.txtAuthor.setText(book.getAuthor());
-
-
         NumberFormat formatter = NumberFormat.getInstance(new Locale("vi", "VN"));
         h.txtPrice.setText(formatter.format(book.getPrice()) + " đ");
 
@@ -101,6 +99,7 @@ public class BookAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             if (h.btnDeleteBook != null) h.btnDeleteBook.setVisibility(View.GONE);
         } else {
             if (h.btnAddToCart != null) h.btnAddToCart.setVisibility(View.GONE);
+            if (h.btnBuyNow != null) h.btnBuyNow.setVisibility(View.GONE);
         }
 
         // ===== CLICK =====
@@ -111,6 +110,12 @@ public class BookAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         if (h.btnAddToCart != null) {
             h.btnAddToCart.setOnClickListener(v -> {
                 if (listener != null) listener.onAddToCart(book);
+            });
+        }
+
+        if (h.btnBuyNow != null) {
+            h.btnBuyNow.setOnClickListener(v -> {
+                if (listener != null) listener.onBuyNow(book);
             });
         }
 
@@ -136,6 +141,7 @@ public class BookAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     static class BookViewHolder extends RecyclerView.ViewHolder {
         TextView txtTitle, txtAuthor, txtPrice;
         ImageView imgBook;
+        Button btnBuyNow;
         ImageButton btnEditBook, btnDeleteBook, btnAddToCart;
 
         public BookViewHolder(@NonNull View itemView) {
@@ -149,6 +155,7 @@ public class BookAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             btnEditBook = itemView.findViewById(R.id.btnEditBook);
             btnDeleteBook = itemView.findViewById(R.id.btnDeleteBook);
             btnAddToCart = itemView.findViewById(R.id.btnAddToCart);
+            btnBuyNow = itemView.findViewById(R.id.btnBuyNow);
         }
     }
 
