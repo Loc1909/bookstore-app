@@ -8,7 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "bookstore.db";
-    private static final int DATABASE_VERSION = 16;
+    private static final int DATABASE_VERSION = 18;
 
     // ------------------- TABLE NAMES -------------------
     public static final String TABLE_BOOK = "books";
@@ -214,32 +214,32 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
-        if (oldVersion < 16) {
+        if (oldVersion < 17) {
 
-            // Drop bảng cart cũ
-            db.execSQL("DROP TABLE IF EXISTS " + TABLE_CART);
+            Cursor cursor = db.rawQuery("PRAGMA table_info(" + TABLE_ORDER + ")", null);
 
-            // Tạo lại bảng cart chuẩn
-            db.execSQL("CREATE TABLE " + TABLE_CART + " (" +
-                    COL_CART_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            boolean hasColumn = false;
+            if (cursor != null) {
+                while (cursor.moveToNext()) {
+                    String columnName = cursor.getString(cursor.getColumnIndexOrThrow("name"));
+                    if (COL_ORDER_TOTAL_PRICE.equals(columnName)) {
+                        hasColumn = true;
+                        break;
+                    }
+                }
+                cursor.close();
+            }
 
-                    COL_CART_USER_ID + " INTEGER NOT NULL, " +
-                    COL_CART_BOOK_ID + " INTEGER NOT NULL, " +
+            if (!hasColumn) {
+                db.execSQL("ALTER TABLE " + TABLE_ORDER +
+                        " ADD COLUMN " + COL_ORDER_TOTAL_PRICE + " REAL NOT NULL DEFAULT 0");
+            }
 
-                    COL_CART_TITLE + " TEXT, " +
-                    COL_CART_PRICE + " REAL, " +
-                    COL_CART_QUANTITY + " INTEGER DEFAULT 1, " +
-                    COL_CART_IMAGE + " TEXT, " +
+        }
 
-                    "UNIQUE(" + COL_CART_USER_ID + ", " + COL_CART_BOOK_ID + "), " +
-
-                    "FOREIGN KEY(" + COL_CART_USER_ID + ") REFERENCES " + TABLE_USER + "(" + COL_USER_ID + ") ON DELETE CASCADE, " +
-                    "FOREIGN KEY(" + COL_CART_BOOK_ID + ") REFERENCES " + TABLE_BOOK + "(" + COL_BOOK_ID + ") ON DELETE CASCADE" +
-                    ")");
-
-            // Tạo index lại
-            db.execSQL("CREATE INDEX idx_cart_user ON " + TABLE_CART + "(" + COL_CART_USER_ID + ")");
-            db.execSQL("CREATE INDEX idx_cart_book ON " + TABLE_CART + "(" + COL_CART_BOOK_ID + ")");
+        if (oldVersion < 18) {
+            db.execSQL("CREATE INDEX IF NOT EXISTS idx_order_user ON " + TABLE_ORDER + "(" + COL_ORDER_USER_ID + ")");
+            db.execSQL("CREATE INDEX IF NOT EXISTS idx_order_item_order ON " + TABLE_ORDER_ITEM + "(" + COL_ORDER_ITEM_ORDER_ID + ")");
         }
     }
 
