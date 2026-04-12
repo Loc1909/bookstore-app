@@ -7,7 +7,10 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.example.bookstore_app.database.DatabaseHelper;
 import com.example.bookstore_app.models.CartItem;
+import com.example.bookstore_app.models.Order;
+import com.example.bookstore_app.models.OrderItem;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class OrderDAO {
@@ -47,6 +50,69 @@ public class OrderDAO {
         db.close();
         return orderId;
     }
+
+    public List<Order> getOrdersByUser(int userId) {
+        List<Order> list = new ArrayList<>();
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        Cursor cursor = db.rawQuery(
+                "SELECT * FROM orders WHERE user_id = ? ORDER BY order_date DESC",
+                new String[]{String.valueOf(userId)}
+        );
+
+        if (cursor.moveToFirst()) {
+            do {
+                Order order = new Order();
+                order.setId(cursor.getInt(cursor.getColumnIndexOrThrow("id")));
+                order.setUserId(cursor.getInt(cursor.getColumnIndexOrThrow("user_id")));
+                order.setTotalPrice(cursor.getDouble(cursor.getColumnIndexOrThrow("total_price")));
+                order.setOrderDate(cursor.getLong(cursor.getColumnIndexOrThrow("order_date")));
+                order.setStatus(cursor.getString(cursor.getColumnIndexOrThrow("status")));
+                list.add(order);
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        db.close();
+        return list;
+    }
+
+    public boolean updateOrderStatus(int orderId, String newStatus) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("status", newStatus);
+        int rows = db.update("orders", values, "id = ?", new String[]{String.valueOf(orderId)});
+        db.close();
+        return rows > 0;
+    }
+
+    public List<OrderItem> getOrderItemsByOrderId(int orderId) {
+        List<OrderItem> list = new ArrayList<>();
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        String query = "SELECT oi.*, b.title " +
+                "FROM order_items oi " +
+                "JOIN books b ON oi.book_id = b.id " +
+                "WHERE oi.order_id = ?";
+
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(orderId)});
+
+        if (cursor.moveToFirst()) {
+            do {
+                OrderItem item = new OrderItem();
+                item.setId(cursor.getInt(cursor.getColumnIndexOrThrow("id")));
+                item.setOrderId(cursor.getInt(cursor.getColumnIndexOrThrow("order_id")));
+                item.setBookId(cursor.getInt(cursor.getColumnIndexOrThrow("book_id")));
+                item.setQuantity(cursor.getInt(cursor.getColumnIndexOrThrow("quantity")));
+                item.setPrice(cursor.getDouble(cursor.getColumnIndexOrThrow("price")));
+                item.setBookTitle(cursor.getString(cursor.getColumnIndexOrThrow("title")));
+                list.add(item);
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        db.close();
+        return list;
+    }
+
     public boolean hasUserBoughtBook(int userId, int bookId) {
 
         SQLiteDatabase db = dbHelper.getReadableDatabase();
