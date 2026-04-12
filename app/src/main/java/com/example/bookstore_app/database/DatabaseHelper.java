@@ -81,7 +81,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
-
+    // ✅ BẬT FOREIGN KEY
     @Override
     public void onConfigure(SQLiteDatabase db) {
         super.onConfigure(db);
@@ -136,34 +136,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // ------------------- ORDER ITEM -------------------
         db.execSQL("CREATE TABLE " + TABLE_ORDER_ITEM + " (" +
                 COL_ORDER_ITEM_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                COL_ORDER_ITEM_ORDER_ID + " INTEGER, " +
-                COL_ORDER_ITEM_BOOK_ID + " INTEGER, " +
-                COL_ORDER_ITEM_QUANTITY + " INTEGER, " +
-                COL_ORDER_ITEM_PRICE + " REAL, " +
-                "FOREIGN KEY(" + COL_ORDER_ITEM_ORDER_ID + ") REFERENCES " + TABLE_ORDER + "(" + COL_ORDER_ID + "), " +
-                "FOREIGN KEY(" + COL_ORDER_ITEM_BOOK_ID + ") REFERENCES " + TABLE_BOOK + "(" + COL_BOOK_ID + "))");
+                        COL_ORDER_ITEM_ORDER_ID + " INTEGER, " +
+                        COL_ORDER_ITEM_BOOK_ID + " INTEGER, " +
+                        COL_ORDER_ITEM_QUANTITY + " INTEGER, " +
+                        COL_ORDER_ITEM_PRICE + " REAL, " +
+                        "FOREIGN KEY(" + COL_ORDER_ITEM_ORDER_ID + ") REFERENCES " + TABLE_ORDER + "(" + COL_ORDER_ID + "), " +
+                        "FOREIGN KEY(" + COL_ORDER_ITEM_BOOK_ID + ") REFERENCES " + TABLE_BOOK + "(" + COL_BOOK_ID + "))");
 
         // ------------------- CART -------------------
         db.execSQL("CREATE TABLE " + TABLE_CART + " (" +
-                COL_CART_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-
-                COL_CART_USER_ID + " INTEGER NOT NULL, " +
-                COL_CART_BOOK_ID + " INTEGER NOT NULL, " +
-
-                COL_CART_TITLE + " TEXT, " +
-                COL_CART_PRICE + " REAL, " +
-                COL_CART_QUANTITY + " INTEGER DEFAULT 1, " +
-                COL_CART_IMAGE + " TEXT, " +
-
-                "UNIQUE(" + COL_CART_USER_ID + ", " + COL_CART_BOOK_ID + "), " +
-
-                "FOREIGN KEY(" + COL_CART_USER_ID + ") REFERENCES " + TABLE_USER + "(" + COL_USER_ID + ") ON DELETE CASCADE, " +
-                "FOREIGN KEY(" + COL_CART_BOOK_ID + ") REFERENCES " + TABLE_BOOK + "(" + COL_BOOK_ID + ") ON DELETE CASCADE" +
-                ")");
-
-        // INDEX
-        db.execSQL("CREATE INDEX idx_cart_user ON " + TABLE_CART + "(" + COL_CART_USER_ID + ")");
-        db.execSQL("CREATE INDEX idx_cart_book ON " + TABLE_CART + "(" + COL_CART_BOOK_ID + ")");
+                        COL_CART_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                        COL_CART_USER_ID + " INTEGER, " +
+                        COL_CART_BOOK_ID + " INTEGER, " +
+                        COL_CART_TITLE + " TEXT, " +
+                        COL_CART_PRICE + " REAL, " +
+                        COL_CART_QUANTITY + " INTEGER, " +
+                        COL_CART_IMAGE + " TEXT, "+
+                        "UNIQUE(" + COL_CART_USER_ID + ", " + COL_CART_BOOK_ID + ")" +
+                        ")");
 
 
         // ------------------- REVIEW -------------------
@@ -209,38 +199,57 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("INSERT INTO " + TABLE_USER + "(" +
                 COL_EMAIL + "," + COL_PASSWORD + "," + COL_FULL_NAME + "," + COL_ROLE + "," + COL_CREATED_AT +
                 ") VALUES ('user@gmail.com','123','User','user'," + now + ")");
+
+
+        db.execSQL("INSERT INTO " + TABLE_ORDER + "(" +
+                COL_ORDER_USER_ID + "," + COL_ORDER_DATE + "," + COL_ORDER_TOTAL_PRICE + "," +
+                COL_ORDER_STATUS + ") VALUES (1, " + now + ", 150000, 'TESTING')");
+
+        db.execSQL("INSERT INTO " + TABLE_ORDER_ITEM + "(" +
+                COL_ORDER_ITEM_ORDER_ID + "," + COL_ORDER_ITEM_BOOK_ID + "," +
+                COL_ORDER_ITEM_QUANTITY + "," + COL_ORDER_ITEM_PRICE
+                + ") VALUES (1,1,2,120000)");
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
-        if (oldVersion < 17) {
-
-            Cursor cursor = db.rawQuery("PRAGMA table_info(" + TABLE_ORDER + ")", null);
-
-            boolean hasColumn = false;
-            if (cursor != null) {
-                while (cursor.moveToNext()) {
-                    String columnName = cursor.getString(cursor.getColumnIndexOrThrow("name"));
-                    if (COL_ORDER_TOTAL_PRICE.equals(columnName)) {
-                        hasColumn = true;
-                        break;
-                    }
-                }
-                cursor.close();
+        if (oldVersion < 14) {
+            if (!isColumnExists(db, TABLE_BOOK, COL_RATING)) {
+                db.execSQL("ALTER TABLE " + TABLE_BOOK + " ADD COLUMN " + COL_RATING + " REAL DEFAULT 0");
             }
-
-            if (!hasColumn) {
-                db.execSQL("ALTER TABLE " + TABLE_ORDER +
-                        " ADD COLUMN " + COL_ORDER_TOTAL_PRICE + " REAL NOT NULL DEFAULT 0");
-            }
-
         }
 
-        if (oldVersion < 18) {
-            db.execSQL("CREATE INDEX IF NOT EXISTS idx_order_user ON " + TABLE_ORDER + "(" + COL_ORDER_USER_ID + ")");
-            db.execSQL("CREATE INDEX IF NOT EXISTS idx_order_item_order ON " + TABLE_ORDER_ITEM + "(" + COL_ORDER_ITEM_ORDER_ID + ")");
+        if (oldVersion < 15) {
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_REVIEW);
+            db.execSQL("CREATE TABLE " + TABLE_REVIEW + " (" +
+                    COL_REVIEW_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    COL_REVIEW_USER_ID + " INTEGER NOT NULL, " +
+                    COL_REVIEW_BOOK_ID + " INTEGER NOT NULL, " +
+                    COL_REVIEW_RATING + " REAL, " +
+                    COL_REVIEW_COMMENT + " TEXT, " +
+                    COL_REVIEW_CREATED_AT + " TEXT DEFAULT CURRENT_TIMESTAMP)");
         }
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CART);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_BOOK);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CATEGORY);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_ORDER_ITEM);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_ORDER);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_USER);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_REVIEW);
+
+        onCreate(db);
     }
 
+    private boolean isColumnExists(SQLiteDatabase db, String tableName, String columnName) {
+        Cursor cursor = db.rawQuery("PRAGMA table_info(" + tableName + ")", null);
+        while (cursor.moveToNext()) {
+            if (cursor.getString(1).equals(columnName)) {
+                cursor.close();
+                return true;
+            }
+        }
+        cursor.close();
+        return false;
+    }
 }

@@ -11,16 +11,13 @@ import com.example.bookstore_app.models.CartItem;
 import java.util.List;
 
 public class OrderDAO {
-
-    private final DatabaseHelper dbHelper;
+    private DatabaseHelper dbHelper;
 
     public OrderDAO(Context context) {
         dbHelper = new DatabaseHelper(context);
     }
 
-    // ================= CREATE ORDER =================
     public long createOrder(int userId, List<CartItem> cartList, double totalPrice) {
-
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         long orderId = -1;
 
@@ -33,11 +30,6 @@ public class OrderDAO {
             orderValues.put("status", "PENDING");
 
             orderId = db.insert("orders", null, orderValues);
-
-            if (orderId == -1) {
-                throw new RuntimeException("Insert order failed");
-            }
-
             for (CartItem item : cartList) {
                 ContentValues itemValues = new ContentValues();
                 itemValues.put("order_id", orderId);
@@ -45,48 +37,40 @@ public class OrderDAO {
                 itemValues.put("quantity", item.getQuantity());
                 itemValues.put("price", item.getPrice());
 
-                long result = db.insert("order_items", null, itemValues);
-
-                if (result == -1) {
-                    throw new RuntimeException("Insert order item failed");
-                }
+                db.insert("order_items", null, itemValues);
             }
-
             db.setTransactionSuccessful();
-
         } finally {
             db.endTransaction();
         }
 
+        db.close();
         return orderId;
     }
-
-    // ================= CHECK PURCHASE =================
     public boolean hasUserBoughtBook(int userId, int bookId) {
 
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
-        String sql =
-                "SELECT COUNT(*) " +
-                        "FROM orders o " +
-                        "JOIN order_items oi ON o.id = oi.order_id " +
-                        "WHERE o.user_id = ? " +
-                        "AND oi.book_id = ? " +
-                        "AND o.status = ?";
+        String query = "SELECT COUNT(*) " +
+                "FROM orders o " +
+                "JOIN order_items od ON o.id = od.order_id " +
+                "WHERE o.user_id = ? " +
+                "AND od.book_id = ? " +
+                "AND o.status = ?";
 
-        Cursor cursor = db.rawQuery(sql, new String[]{
+        Cursor cursor = db.rawQuery(query, new String[]{
                 String.valueOf(userId),
                 String.valueOf(bookId),
-                "COMPLETED"
+                "COMPLETED" // chỉ tính đơn đã hoàn thành
         });
 
         boolean result = false;
 
-        try {
+        if (cursor != null) {
             if (cursor.moveToFirst()) {
-                result = cursor.getInt(0) > 0;
+                int count = cursor.getInt(0);
+                result = count > 0;
             }
-        } finally {
             cursor.close();
         }
 

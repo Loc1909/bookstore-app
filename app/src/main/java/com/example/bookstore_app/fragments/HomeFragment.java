@@ -14,16 +14,16 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.bookstore_app.R;
 import com.example.bookstore_app.activities.BookDetailActivity;
+import com.example.bookstore_app.R;
 import com.example.bookstore_app.activities.CartActivity;
 import com.example.bookstore_app.adapters.BookAdapter;
 import com.example.bookstore_app.database.dao.BookDAO;
 import com.example.bookstore_app.database.dao.CartDAO;
 import com.example.bookstore_app.database.dao.CategoryDAO;
 import com.example.bookstore_app.models.Book;
-import com.example.bookstore_app.models.Category;
 import com.example.bookstore_app.utils.SessionManager;
+import com.example.bookstore_app.models.Category;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 
@@ -34,6 +34,8 @@ public class HomeFragment extends Fragment {
 
     private int currentUserId;
     private SessionManager sessionManager;
+
+    private RecyclerView recyclerView;
     private RecyclerView recyclerBooks, recyclerFeatured;
     private SearchView searchView;
     private ImageView ivCart;
@@ -72,6 +74,14 @@ public class HomeFragment extends Fragment {
         recyclerFeatured = view.findViewById(R.id.recyclerFeatured);
         searchView = view.findViewById(R.id.searchView);
         ivCart = view.findViewById(R.id.ivCart);
+
+        sessionManager = new SessionManager(requireContext());
+        currentUserId = sessionManager.getUserId();
+
+        if (currentUserId == -1) {
+            Toast.makeText(requireContext(), "Bạn chưa đăng nhập!", Toast.LENGTH_SHORT).show();
+            return;
+        }
         chipGroupCategories = view.findViewById(R.id.chipGroupCategories);
 
         bookDAO = new BookDAO(getContext());
@@ -81,16 +91,12 @@ public class HomeFragment extends Fragment {
                 startActivity(new Intent(getActivity(), CartActivity.class))
         );
 
-        sessionManager = new SessionManager(requireContext());
-        currentUserId = sessionManager.getUserId();
-
         setupBooksRecycler();
         setupFeaturedRecycler();
 
         loadCategoryChips();
-
-        loadFirstBooks();      //  ONLY BOOKS
-        loadFeatured();        //  ONLY FEATURED
+        loadFirstBooks();
+        loadFeatured();
 
         setupSearch();
     }
@@ -120,7 +126,7 @@ public class HomeFragment extends Fragment {
 
                     @Override
                     public void onAddToCart(Book book) {
-                        cartDAO.addToCart(currentUserId, book, 1);
+                        cartDAO.addToCart(currentUserId,book,1);
                         Toast.makeText(getContext(), "Đã thêm vào giỏ", Toast.LENGTH_SHORT).show();
                     }
                 },
@@ -217,7 +223,7 @@ public class HomeFragment extends Fragment {
 
                     @Override
                     public void onAddToCart(Book book) {
-                        cartDAO.addToCart(currentUserId, book, 1);
+                        cartDAO.addToCart(currentUserId,book,1);
                         Toast.makeText(getContext(), "Đã thêm vào giỏ", Toast.LENGTH_SHORT).show();
                     }
                 },

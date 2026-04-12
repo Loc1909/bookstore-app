@@ -6,10 +6,16 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.*;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -32,36 +38,29 @@ import java.util.List;
 import java.util.Locale;
 
 public class BookDetailActivity extends AppCompatActivity {
-
-    private ImageView imgBook;
-    private TextView tvTitle, tvPrice;
+    private ImageView ivBookImage, btnMinus, btnPlus, imgBook;
+    private TextView tvBookName,tvTitle, tvPrice, tvDescription, tvQuantity, tvStock, tvAuthor, tvCategory;
+    private Button btnAddToCart, btnBuyNow;
 
     private RatingBar ratingAvg;
+
     private TextView tvRatingAvg, tvReviewCount;
     private RecyclerView rvReview;
     private Button btnReview;
-
-    private ImageView btnMinus, btnPlus;
-    private TextView tvQuantity, tvAuthor, tvStock, tvCategory;
-
-    private Button btnAddToCart, btnBuyNow;
-
     private ReviewAdapter adapter;
-
     private ReviewDAO reviewDAO;
     private CategoryDAO categoryDAO;
     private OrderDAO orderDAO;
     private BookDAO bookDAO;
     private CartDAO cartDAO;
     private SessionManager sessionManager;
-
     private int bookId, userId, quantity = 1;
     private Book currentBook;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_book_detail);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -129,7 +128,6 @@ public class BookDetailActivity extends AppCompatActivity {
         loadReviewData();
         setupReviewButton();
         setupQuantity();
-        setupActionButtons();
     }
 
     private void bindBookData() {
@@ -269,9 +267,6 @@ public class BookDetailActivity extends AppCompatActivity {
                 tvQuantity.setText(String.valueOf(quantity));
             }
         });
-    }
-
-    private void setupActionButtons() {
 
         btnAddToCart.setOnClickListener(v -> {
             SessionManager sessionManager = new SessionManager(this);

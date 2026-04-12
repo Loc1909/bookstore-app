@@ -40,6 +40,11 @@ public class BookAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         this.isAdmin = isAdmin;
         this.layoutType = layoutType;
     }
+    public BookAdapter(List<Book> bookList, OnBookActionListener listener, boolean isAdmin) {
+        this.bookList = (bookList != null) ? bookList : new ArrayList<>();
+        this.listener = listener;
+        this.isAdmin = isAdmin;
+    }
 
     @Override
     public int getItemViewType(int position) {
