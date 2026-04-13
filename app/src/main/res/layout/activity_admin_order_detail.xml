@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="#F4F6FA">
+
+    <!-- ORDER INFO -->
+    <TextView
+        android:id="@+id/tvOrderId"
+        android:text="#ORD123"
+        android:textStyle="bold"
+        android:textSize="18sp"
+        android:textColor="#1A1A2E"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"/>
+
+    <TextView
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:id="@+id/tvStatus"
+        android:text="PENDING"
+        android:textSize="14sp"
+        android:layout_marginTop="4dp"/>
+
+    <TextView
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:id="@+id/tvDate"
+        android:text="Ngày đặt"
+        android:layout_marginTop="4dp"/>
+
+    <TextView
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:id="@+id/tvTotal"
+        android:text="Tổng tiền"
+        android:textStyle="bold"
+        android:layout_marginTop="6dp"/>
+
+    <!-- DIVIDER -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#DDD"
+        android:layout_marginVertical="10dp"/>
+
+    <!-- LIST ITEMS -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvItems"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+
+    <!-- ACTION BUTTON -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end">
+
+        <Button
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:id="@+id/btnCancel"
+            android:text="Hủy"
+            android:visibility="gone"/>
+
+        <Button
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:id="@+id/btnAction"
+            android:text="Action"
+            android:layout_marginStart="10dp"
+            android:visibility="gone"/>
+    </LinearLayout>
+
+</LinearLayout>

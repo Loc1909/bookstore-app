@@ -73,7 +73,11 @@ public class CartActivity extends AppCompatActivity {
     }
 
     private void loadCartData() {
-        cartList = cartDAO.getCartItems(currentUserId);
+
+        int cartId = cartDAO.getCartIdByUser(currentUserId);
+
+        cartList = cartDAO.getCartItems(cartId);
+
         if (cartList == null || cartList.isEmpty()) {
             layoutEmpty.setVisibility(View.VISIBLE);
             recyclerView.setVisibility(View.GONE);
@@ -81,6 +85,7 @@ public class CartActivity extends AppCompatActivity {
         } else {
             layoutEmpty.setVisibility(View.GONE);
             recyclerView.setVisibility(View.VISIBLE);
+
             adapter = new CartAdapter(cartList, new CartAdapter.OnCartActionListener() {
                 @Override
                 public void onQuantityChanged(CartItem item, int newQuantity) {
@@ -100,10 +105,12 @@ public class CartActivity extends AppCompatActivity {
                                 cartDAO.deleteItem(item.getId());
                                 cartList.remove(item);
                                 adapter.notifyDataSetChanged();
+
                                 if (cartList.isEmpty()) {
                                     layoutEmpty.setVisibility(View.VISIBLE);
                                     recyclerView.setVisibility(View.GONE);
                                 }
+
                                 updateTotal();
                             })
                             .setNegativeButton("Hủy", null)
@@ -115,6 +122,7 @@ public class CartActivity extends AppCompatActivity {
                     updateTotal();
                 }
             });
+
             recyclerView.setAdapter(adapter);
             updateTotal();
         }

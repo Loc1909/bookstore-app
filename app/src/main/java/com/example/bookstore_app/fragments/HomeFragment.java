@@ -142,7 +142,8 @@ public class HomeFragment extends Fragment {
 
                     @Override
                     public void onAddToCart(Book book) {
-                        cartDAO.addToCart(currentUserId,book,1);
+                        int cartId = cartDAO.getCartIdByUser(currentUserId);
+                        cartDAO.addToCart(cartId, book, 1);
                         Toast.makeText(getContext(), "Đã thêm vào giỏ", Toast.LENGTH_SHORT).show();
                     }
                 },
@@ -239,7 +240,8 @@ public class HomeFragment extends Fragment {
 
                     @Override
                     public void onAddToCart(Book book) {
-                        cartDAO.addToCart(currentUserId,book,1);
+                        int cartId = cartDAO.getCartIdByUser(currentUserId);
+                        cartDAO.addToCart(cartId, book, 1);
                         Toast.makeText(getContext(), "Đã thêm vào giỏ", Toast.LENGTH_SHORT).show();
                     }
                 },

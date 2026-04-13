@@ -85,6 +85,133 @@ public class OrderDAO {
         return rows > 0;
     }
 
+    public List<Order> getAll() {
+        List<Order> list = new ArrayList<>();
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        Cursor cursor = db.rawQuery(
+                "SELECT * FROM orders ORDER BY order_date DESC",
+                null
+        );
+
+        if (cursor.moveToFirst()) {
+            do {
+                Order order = new Order();
+                order.setId(cursor.getInt(cursor.getColumnIndexOrThrow("id")));
+                order.setUserId(cursor.getInt(cursor.getColumnIndexOrThrow("user_id")));
+                order.setTotalPrice(cursor.getDouble(cursor.getColumnIndexOrThrow("total_price")));
+                order.setOrderDate(cursor.getLong(cursor.getColumnIndexOrThrow("order_date")));
+                order.setStatus(cursor.getString(cursor.getColumnIndexOrThrow("status")));
+                list.add(order);
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        db.close();
+        return list;
+    }
+
+
+    public List<Order> getAllWithUserName() {
+        List<Order> list = new ArrayList<>();
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        String query = "SELECT o.*, u.fullName AS fullName " +
+                "FROM orders o " +
+                "JOIN users u ON o.user_id = u.id " +
+                "ORDER BY o.order_date DESC";
+
+        Cursor cursor = db.rawQuery(query, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                Order order = new Order();
+                order.setId(cursor.getInt(cursor.getColumnIndexOrThrow("id")));
+                order.setUserId(cursor.getInt(cursor.getColumnIndexOrThrow("user_id")));
+                order.setTotalPrice(cursor.getDouble(cursor.getColumnIndexOrThrow("total_price")));
+                order.setOrderDate(cursor.getLong(cursor.getColumnIndexOrThrow("order_date")));
+                order.setStatus(cursor.getString(cursor.getColumnIndexOrThrow("status")));
+
+                list.add(order);
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        db.close();
+        return list;
+    }
+
+    public boolean update(Order order) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put("user_id", order.getUserId());
+        values.put("order_date", order.getOrderDate());
+        values.put("total_price", order.getTotalPrice());
+        values.put("status", order.getStatus());
+
+        int rows = db.update(
+                "orders",
+                values,
+                "id = ?",
+                new String[]{String.valueOf(order.getId())}
+        );
+
+        db.close();
+        return rows > 0;
+    }
+
+
+    public List<Order> getOrdersByStatus(String status) {
+        List<Order> list = new ArrayList<>();
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        Cursor cursor = db.rawQuery(
+                "SELECT * FROM orders WHERE status = ? ORDER BY order_date DESC",
+                new String[]{status}
+        );
+
+        if (cursor.moveToFirst()) {
+            do {
+                Order order = new Order();
+                order.setId(cursor.getInt(cursor.getColumnIndexOrThrow("id")));
+                order.setUserId(cursor.getInt(cursor.getColumnIndexOrThrow("user_id")));
+                order.setTotalPrice(cursor.getDouble(cursor.getColumnIndexOrThrow("total_price")));
+                order.setOrderDate(cursor.getLong(cursor.getColumnIndexOrThrow("order_date")));
+                order.setStatus(cursor.getString(cursor.getColumnIndexOrThrow("status")));
+                list.add(order);
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        db.close();
+        return list;
+    }
+
+    public Order getById(int orderId) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        Cursor cursor = db.rawQuery(
+                "SELECT * FROM orders WHERE id = ?",
+                new String[]{String.valueOf(orderId)}
+        );
+
+        Order order = null;
+
+        if (cursor.moveToFirst()) {
+            order = new Order();
+            order.setId(cursor.getInt(cursor.getColumnIndexOrThrow("id")));
+            order.setUserId(cursor.getInt(cursor.getColumnIndexOrThrow("user_id")));
+            order.setTotalPrice(cursor.getDouble(cursor.getColumnIndexOrThrow("total_price")));
+            order.setOrderDate(cursor.getLong(cursor.getColumnIndexOrThrow("order_date")));
+            order.setStatus(cursor.getString(cursor.getColumnIndexOrThrow("status")));
+        }
+
+        cursor.close();
+        db.close();
+        return order;
+    }
+
     public List<OrderItem> getOrderItemsByOrderId(int orderId) {
         List<OrderItem> list = new ArrayList<>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();

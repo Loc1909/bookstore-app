@@ -111,7 +111,7 @@ public class RegisterFragment extends Fragment {
 
             boolean finalSuccess = success;
 
-            // FIX crash lifecycle
+
             if (isAdded()) {
                 requireActivity().runOnUiThread(() -> {
                     showProgress(false);

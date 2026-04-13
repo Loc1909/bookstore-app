@@ -65,6 +65,7 @@ public class AdminDashboardActivity extends AppCompatActivity {
         menuUsers      = findViewById(R.id.menuUsers);
         menuOrders     = findViewById(R.id.menuOrders);
         menuStats      = findViewById(R.id.menuStats);
+        menuOrders     = findViewById(R.id.menuOrders);
 
         menuBooks.setOnClickListener(v ->
                 startActivity(new Intent(this, AdminBookActivity.class))
@@ -78,9 +79,9 @@ public class AdminDashboardActivity extends AppCompatActivity {
                 startActivity(new Intent(this, AdminUserActivity.class))
         );
 
-//        menuOrders.setOnClickListener(v ->
-//                startActivity(new Intent(this, AdminOrderActivity.class))
-//        );
+        menuOrders.setOnClickListener(v ->
+                startActivity(new Intent(this, AdminOrderActivity.class))
+        );
 
         menuStats.setOnClickListener(v ->
                 startActivity(new Intent(this, StatsActivity.class))

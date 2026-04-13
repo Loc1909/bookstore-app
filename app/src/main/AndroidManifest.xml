@@ -32,6 +32,8 @@
         <activity android:name=".activities.AdminUserActivity" android:exported="false"/>
         <activity android:name=".activities.AdminCategoryActivity" android:exported="false"/>
         <activity android:name=".activities.StatsActivity" android:exported="false"/>
+        <activity android:name=".activities.AdminOrderActivity" android:exported="false"/>
+        <activity android:name=".activities.AdminOrderDetailActivity" android:exported="false"/>
 
         <!-- Book -->
         <activity android:name=".activities.AddBookActivity" android:exported="false"/>

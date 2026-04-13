@@ -1,11 +1,14 @@
 package com.example.bookstore_app.fragments;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -26,6 +29,8 @@ import java.util.Locale;
 import android.net.Uri;
 import android.content.Intent;
 import android.provider.MediaStore;
+import android.widget.Toast;
+
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 
@@ -40,7 +45,9 @@ public class ProfileFragment extends Fragment {
     private ImageView imgAvatar, btnChangeAvatar;
     private TextView txtUserName, txtUserEmail, txtPhone, txtAddress, txtRole, txtMemberSince;
     private MaterialCardView adminCard;
-    private Button btnLogout, btnAdminDashboard;
+    private Button btnLogout, btnAdminDashboard, btnEditProfile;
+    private UserDAO userDAO;
+    private int currentUserId;
 
     private ActivityResultLauncher<Intent> pickImageLauncher;
 
@@ -53,6 +60,8 @@ public class ProfileFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         initViews(view);
+        userDAO = new UserDAO(requireContext());
+        currentUserId = sessionManager.getUserId();
         initActions();
         loadUser();
     }
@@ -71,7 +80,7 @@ public class ProfileFragment extends Fragment {
         txtAddress = view.findViewById(R.id.txtAddress);
         txtRole = view.findViewById(R.id.txtRole);
         txtMemberSince = view.findViewById(R.id.txtMemberSince);
-
+        btnEditProfile = view.findViewById(R.id.btnEditProfile);
         adminCard = view.findViewById(R.id.adminCard);
         btnLogout = view.findViewById(R.id.btnLogout);
         btnAdminDashboard = view.findViewById(R.id.btnAdminDashboard);
@@ -106,6 +115,12 @@ public class ProfileFragment extends Fragment {
         );
 
         btnChangeAvatar.setOnClickListener(v -> openGallery());
+        btnEditProfile.setOnClickListener(v -> {
+            User user = sessionManager.getUser();
+            if (user != null) {
+                showEditDialog(user.getPhone(), user.getAddress());
+            }
+        });
     }
 
     private void openGallery() {
@@ -123,10 +138,10 @@ public class ProfileFragment extends Fragment {
 
         if (user == null) return;
 
-        // 🔥 Xóa avatar cũ
+        //  Xóa avatar cũ
         deleteOldAvatar(user.getAvatar());
 
-        // 🔥 Update DB
+        //  Update DB
         boolean success = userDAO.updateAvatar(userId, newPath);
 
         if (success) {
@@ -199,6 +214,73 @@ public class ProfileFragment extends Fragment {
         return s == null || s.trim().isEmpty();
     }
 
+    private void showEditDialog(String phone, String address) {
+
+        View view = getLayoutInflater().inflate(R.layout.dialog_edit_profile, null);
+
+        EditText edtPhone = view.findViewById(R.id.edtPhone);
+        EditText edtAddress = view.findViewById(R.id.edtAddress);
+
+        edtPhone.setText(phone);
+        edtAddress.setText(address);
+
+        AlertDialog dialog = new AlertDialog.Builder(requireContext())
+                .setView(view)
+                .create();
+
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        }
+
+        TextView btnSave = view.findViewById(R.id.btnSave);
+        TextView btnCancel = view.findViewById(R.id.btnCancel);
+
+        btnSave.setOnClickListener(v -> {
+            String newPhone = edtPhone.getText().toString().trim();
+            String newAddress = edtAddress.getText().toString().trim();
+
+            updateProfile(newPhone, newAddress);
+            dialog.dismiss();
+        });
+
+        btnCancel.setOnClickListener(v -> dialog.dismiss());
+
+        dialog.show();
+
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setLayout(
+                    (int) (getResources().getDisplayMetrics().widthPixels * 0.9),
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+            );
+        }
+    }
+
+    private void updateProfile(String phone, String address) {
+
+        User user = sessionManager.getUser();
+        if (user == null) return;
+
+        user.setId(currentUserId);
+        user.setPhone(phone);
+        user.setAddress(address);
+
+        boolean success = userDAO.updateUser(user);
+
+        if (success) {
+            txtPhone.setText(phone);
+            txtAddress.setText(address);
+
+            sessionManager.updateUserData(user);
+
+            Toast.makeText(requireContext(),
+                    "Cập nhật thành công",
+                    Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(requireContext(),
+                    "Cập nhật thất bại",
+                    Toast.LENGTH_SHORT).show();
+        }
+    }
     private String capitalize(String s) {
         return s.substring(0, 1).toUpperCase() + s.substring(1);
     }
