@@ -1,25 +1,28 @@
 package com.example.bookstore_app.models;
 
 public class CartItem {
-    public int id;
-    public int userId;
-    public int bookId;
-    public String title;
-    public double price;
-    public int quantity;
-    public String imageUrl;
+    private int id;
+    private int userId;
+    private int cartId;
+    private int bookId;
+    private String title;
+    private double price;
+    private int quantity;
+    private String imageUrl;
+    private boolean selected;
 
     public CartItem() {
     }
 
-    public CartItem(int id, int userId, int bookId, String title, double price, int quantity, String imageUrl) {
+    public CartItem(int id, int cartId, int bookId, String title, double price, int quantity, String imageUrl) {
         this.id = id;
-        this.userId = userId;
+        this.cartId = cartId;
         this.bookId = bookId;
         this.title = title;
         this.price = price;
         this.quantity = quantity;
         this.imageUrl = imageUrl;
+        this.selected = false;
     }
 
     public int getId() {
@@ -76,5 +79,21 @@ public class CartItem {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+    }
+
+    public int getCartId() {
+        return cartId;
+    }
+
+    public void setCartId(int cartId) {
+        this.cartId = cartId;
     }
 }
