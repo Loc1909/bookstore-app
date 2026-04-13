@@ -261,15 +261,15 @@ public class BookDetailActivity extends AppCompatActivity {
 
         btnAddToCart.setOnClickListener(v -> {
             SessionManager sessionManager = new SessionManager(this);
-            int userId = sessionManager.getUserId();
+            int currentUserId = sessionManager.getUserId();
 
             if (userId == -1) {
                 Toast.makeText(this, "Bạn chưa đăng nhập!", Toast.LENGTH_SHORT).show();
                 return;
             }
-
+            int cartId = cartDAO.getCartIdByUser(currentUserId);
             CartDAO cartDAO = new CartDAO(this);
-            cartDAO.addToCart(userId, currentBook, quantity);
+            cartDAO.addToCart(cartId, currentBook, quantity);
 
             Toast.makeText(this, "Đã thêm vào giỏ", Toast.LENGTH_SHORT).show();
             finish();

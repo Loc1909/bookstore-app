@@ -7,10 +7,11 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.example.bookstore_app.database.DatabaseHelper;
 import com.example.bookstore_app.models.User;
-import com.example.bookstore_app.utils.SessionManager;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class UserDAO {
 
@@ -36,23 +37,26 @@ public class UserDAO {
             values.put(DatabaseHelper.COL_FULL_NAME, user.getFullName());
             values.put(DatabaseHelper.COL_PHONE, user.getPhone());
             values.put(DatabaseHelper.COL_ADDRESS, user.getAddress());
-            values.put(DatabaseHelper.COL_ROLE, user.getRole() != null ? user.getRole() : "user");
+            values.put(DatabaseHelper.COL_ROLE,
+                    user.getRole() != null ? user.getRole() : "user");
             values.put(DatabaseHelper.COL_AVATAR, user.getAvatar());
             values.put(DatabaseHelper.COL_CREATED_AT, System.currentTimeMillis());
 
-            long result = db.insert(DatabaseHelper.TABLE_USER, null, values);
-            if (result == -1) {
+            long userId = db.insert(DatabaseHelper.TABLE_USER, null, values);
+            if (userId == -1) return false;
+
+            ContentValues cart = new ContentValues();
+            cart.put(DatabaseHelper.COL_CART_USER_ID, userId);
+
+            if (db.insert(DatabaseHelper.TABLE_CART, null, cart) == -1) {
                 return false;
             }
-            ContentValues v2 = new ContentValues();
-            v2.put(DatabaseHelper.COL_CART_USER_ID, result);
-            long result2 = db.insert(DatabaseHelper.TABLE_CART, null, v2);
-            if (result2 == -1) {
-                return false;
-            }
+
             db.setTransactionSuccessful();
             return true;
-        }finally {
+
+
+        } finally {
             db.endTransaction();
             db.close();
         }
@@ -80,6 +84,67 @@ public class UserDAO {
         return user;
     }
 
+
+    public boolean updateProfile(int userId, String phone, String address) {
+
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(DatabaseHelper.COL_PHONE, phone);
+        values.put(DatabaseHelper.COL_ADDRESS, address);
+
+        int result = db.update(
+                DatabaseHelper.TABLE_USER,
+                values,
+                DatabaseHelper.COL_USER_ID + "=?",
+                new String[]{String.valueOf(userId)}
+        );
+
+        db.close();
+        return result > 0;
+    }
+
+
+    public String getFullNameById(int userId) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        Cursor c = db.rawQuery(
+                "SELECT " + DatabaseHelper.COL_FULL_NAME +
+                        " FROM " + DatabaseHelper.TABLE_USER +
+                        " WHERE " + DatabaseHelper.COL_USER_ID + " = ?",
+                new String[]{String.valueOf(userId)}
+        );
+
+        String name = null;
+        if (c.moveToFirst()) {
+            name = c.getString(0);
+        }
+
+        c.close();
+        db.close();
+        return name;
+    }
+
+    public Map<Integer, String> getUserMap() {
+        Map<Integer, String> map = new HashMap<>();
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        Cursor c = db.rawQuery(
+                "SELECT " + DatabaseHelper.COL_USER_ID + ", " +
+                        DatabaseHelper.COL_FULL_NAME +
+                        " FROM " + DatabaseHelper.TABLE_USER,
+                null
+        );
+
+        while (c.moveToNext()) {
+            map.put(c.getInt(0), c.getString(1));
+        }
+
+        c.close();
+        db.close();
+        return map;
+    }
+
     // ================= GET BY ID =================
     public User getUserById(int id) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
@@ -100,7 +165,6 @@ public class UserDAO {
         db.close();
         return user;
     }
-
 
     // ================= GET BY EMAIL =================
     public User getUserByEmail(String email) {
@@ -125,16 +189,17 @@ public class UserDAO {
 
     // ================= CHECK EMAIL =================
     private boolean isEmailExists(SQLiteDatabase db, String email) {
-        Cursor cursor = db.rawQuery(
-                "SELECT 1 FROM " + DatabaseHelper.TABLE_USER +
-                        " WHERE " + DatabaseHelper.COL_EMAIL + "=? LIMIT 1",
-                new String[]{email}
-        );
-
-        boolean exists = cursor.moveToFirst();
-        cursor.close();
-
-        return exists;
+        Cursor cursor = null;
+        try {
+            cursor = db.rawQuery(
+                    "SELECT 1 FROM " + DatabaseHelper.TABLE_USER +
+                            " WHERE " + DatabaseHelper.COL_EMAIL + "=? LIMIT 1",
+                    new String[]{email}
+            );
+            return cursor.moveToFirst();
+        } finally {
+            if (cursor != null) cursor.close();
+        }
     }
 
     // ================= GET ALL =================
@@ -159,8 +224,6 @@ public class UserDAO {
         db.close();
         return list;
     }
-
-
 
     // ================= UPDATE =================
     public boolean updateUser(User user) {
@@ -255,5 +318,4 @@ public class UserDAO {
 
         return user;
     }
-
 }

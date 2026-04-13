@@ -197,6 +197,16 @@
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnEditProfile"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:textColor="@color/white"
+                android:text="Chỉnh sửa thông tin"
+                android:textAllCaps="false"
+                android:layout_marginTop="12dp"
+                app:cornerRadius="12dp"
+                app:backgroundTint="@color/gold_primary"/>
 
             <!-- ADMIN -->
             <com.google.android.material.card.MaterialCardView
@@ -205,6 +215,7 @@
                 android:layout_height="wrap_content"
                 android:visibility="gone"
                 android:layout_marginBottom="16dp"
+                android:layout_marginTop="16dp"
                 app:cardBackgroundColor="@color/dark_espresso_light"
                 app:cardCornerRadius="16dp">
 

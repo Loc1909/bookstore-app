@@ -2,7 +2,6 @@ package com.example.bookstore_app.models;
 
 public class CartItem {
     private int id;
-    private int userId;
     private int cartId;
     private int bookId;
     private String title;
@@ -63,14 +62,6 @@ public class CartItem {
 
     public void setQuantity(int quantity) {
         this.quantity = quantity;
-    }
-
-    public int getUserId() {
-        return userId;
-    }
-
-    public void setUserId(int userId) {
-        this.userId = userId;
     }
 
     public String getImageUrl() {

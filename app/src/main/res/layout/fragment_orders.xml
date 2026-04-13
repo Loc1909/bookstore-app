@@ -23,7 +23,16 @@
             android:paddingBottom="16dp">
 
             <TextView
-                android:layout_marginTop="7sp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Đơn hàng"
+                android:textColor="@color/gold_muted"
+                android:textSize="11sp"
+                android:textAllCaps="true"
+                android:letterSpacing="0.12"
+                android:layout_marginBottom="2dp"/>
+
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Đơn hàng của bạn"
@@ -38,7 +47,9 @@
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        android:fillViewport="true"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:background="@color/bg_cream">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -46,22 +57,60 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rvOrders"
+            <!-- CARD chứa danh sách -->
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:nestedScrollingEnabled="false"/>
+                app:cardBackgroundColor="@color/bg_cream"
+                app:strokeWidth="0dp">
 
-            <TextView
-                android:id="@+id/tvNoOrders"
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvOrders"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:nestedScrollingEnabled="false"/>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- EMPTY STATE -->
+            <LinearLayout
+                android:id="@+id/layoutEmptyOrders"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="100dp"
+                android:orientation="vertical"
                 android:gravity="center"
-                android:text="Bạn chưa có đơn hàng nào"
-                android:textColor="@color/dark_espresso"
-                android:textSize="16sp"
-                android:visibility="gone" />
+                android:layout_marginTop="60dp"
+                android:visibility="gone">
+
+                <!-- ICON -->
+                <ImageView
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:src="@drawable/ic_empty_box"
+                    android:alpha="0.7"
+                    android:layout_marginBottom="12dp"/>
+
+                <!-- TEXT -->
+                <TextView
+                    android:id="@+id/tvNoOrders"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Bạn chưa có đơn hàng nào"
+                    android:textColor="@color/dark_espresso"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:gravity="center"/>
+
+                <!-- SUB TEXT -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Hãy mua sắm để tạo đơn hàng đầu tiên"
+                    android:textColor="@color/dark_espresso_light"
+                    android:textSize="13sp"
+                    android:layout_marginTop="6dp"/>
+            </LinearLayout>
+
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 

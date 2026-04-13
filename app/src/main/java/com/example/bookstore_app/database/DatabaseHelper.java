@@ -8,25 +8,23 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "bookstore.db";
-    private static final int DATABASE_VERSION = 18;
+    private static final int DATABASE_VERSION = 21;
 
-    // ------------------- TABLE NAMES -------------------
+    // ---------------- TABLE NAMES ----------------
     public static final String TABLE_BOOK = "books";
     public static final String TABLE_CATEGORY = "categories";
     public static final String TABLE_USER = "users";
     public static final String TABLE_ORDER = "orders";
     public static final String TABLE_ORDER_ITEM = "order_items";
     public static final String TABLE_CART = "carts";
-
     public static final String TABLE_CART_ITEM = "cart_items";
     public static final String TABLE_REVIEW = "reviews";
 
-
-    // ------------------- CATEGORY -------------------
+    // ---------------- CATEGORY ----------------
     public static final String COL_CATEGORY_ID = "id";
     public static final String COL_CATEGORY_NAME = "name";
 
-    // ------------------- BOOK -------------------
+    // ---------------- BOOK ----------------
     public static final String COL_BOOK_ID = "id";
     public static final String COL_TITLE = "title";
     public static final String COL_AUTHOR = "author";
@@ -37,7 +35,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COL_STOCK = "stock";
     public static final String COL_RATING = "rating";
 
-    // ------------------- USER -------------------
+    // ---------------- USER ----------------
     public static final String COL_USER_ID = "id";
     public static final String COL_EMAIL = "email";
     public static final String COL_PASSWORD = "password";
@@ -48,25 +46,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COL_AVATAR = "avatar";
     public static final String COL_CREATED_AT = "createdAt";
 
-    // ------------------- ORDER -------------------
-    public static final String COL_ORDER_ID = "id";
-    public static final String COL_ORDER_USER_ID = "user_id";
-    public static final String COL_ORDER_TOTAL_PRICE = "total_price";
-    public static final String COL_ORDER_DATE = "order_date";
-    public static final String COL_ORDER_STATUS = "status";
-
-    // ------------------- ORDER ITEM -------------------
-    public static final String COL_ORDER_ITEM_ID = "id";
-    public static final String COL_ORDER_ITEM_ORDER_ID = "order_id";
-    public static final String COL_ORDER_ITEM_BOOK_ID = "book_id";
-    public static final String COL_ORDER_ITEM_QUANTITY = "quantity";
-    public static final String COL_ORDER_ITEM_PRICE = "price";
-
-    // ------------------- CART -------------------
+    // ---------------- CART ----------------
     public static final String COL_CART_ID = "id";
     public static final String COL_CART_USER_ID = "user_id";
 
-    // ------------------- CART_ITEM -------------------
+    // ---------------- CART ITEM ----------------
     public static final String COL_CART_ITEM_ID = "id";
     public static final String COL_CART_ITEM_CART_ID = "cart_id";
     public static final String COL_CART_ITEM_BOOK_ID = "book_id";
@@ -75,7 +59,21 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COL_CART_ITEM_QUANTITY = "quantity";
     public static final String COL_CART_ITEM_IMAGE = "imageUrl";
 
-    // ------------------- REVIEW -------------------
+    // ---------------- ORDER ----------------
+    public static final String COL_ORDER_ID = "id";
+    public static final String COL_ORDER_USER_ID = "user_id";
+    public static final String COL_ORDER_TOTAL_PRICE = "total_price";
+    public static final String COL_ORDER_DATE = "order_date";
+    public static final String COL_ORDER_STATUS = "status";
+
+    // ---------------- ORDER ITEM ----------------
+    public static final String COL_ORDER_ITEM_ID = "id";
+    public static final String COL_ORDER_ITEM_ORDER_ID = "order_id";
+    public static final String COL_ORDER_ITEM_BOOK_ID = "book_id";
+    public static final String COL_ORDER_ITEM_QUANTITY = "quantity";
+    public static final String COL_ORDER_ITEM_PRICE = "price";
+
+    // ---------------- REVIEW ----------------
     public static final String COL_REVIEW_ID = "id";
     public static final String COL_REVIEW_USER_ID = "user_id";
     public static final String COL_REVIEW_BOOK_ID = "book_id";
@@ -87,22 +85,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
-    // ✅ BẬT FOREIGN KEY
     @Override
     public void onConfigure(SQLiteDatabase db) {
         super.onConfigure(db);
         db.setForeignKeyConstraintsEnabled(true);
     }
 
+
     @Override
     public void onCreate(SQLiteDatabase db) {
 
-        // ------------------- CATEGORY -------------------
         db.execSQL("CREATE TABLE " + TABLE_CATEGORY + " (" +
                 COL_CATEGORY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 COL_CATEGORY_NAME + " TEXT UNIQUE)");
 
-        // ------------------- BOOK -------------------
         db.execSQL("CREATE TABLE " + TABLE_BOOK + " (" +
                 COL_BOOK_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 COL_TITLE + " TEXT, " +
@@ -113,10 +109,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 COL_DESCRIPTION + " TEXT, " +
                 COL_STOCK + " INTEGER, " +
                 COL_RATING + " REAL DEFAULT 0, " +
-                "FOREIGN KEY(" + COL_CATEGORY_ID_BOOK + ") REFERENCES " + TABLE_CATEGORY + "(" + COL_CATEGORY_ID + ")" +
-                ")");
+                "FOREIGN KEY(" + COL_CATEGORY_ID_BOOK + ") REFERENCES " + TABLE_CATEGORY + "(" + COL_CATEGORY_ID + "))");
 
-        // ------------------- USER -------------------
         db.execSQL("CREATE TABLE " + TABLE_USER + " (" +
                 COL_USER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 COL_EMAIL + " TEXT UNIQUE NOT NULL, " +
@@ -128,34 +122,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 COL_AVATAR + " TEXT, " +
                 COL_CREATED_AT + " INTEGER)");
 
-
-        // ------------------- ORDER -------------------
-        db.execSQL("CREATE TABLE " + TABLE_ORDER + " (" +
-                COL_ORDER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                COL_ORDER_USER_ID + " INTEGER, " +
-                COL_ORDER_TOTAL_PRICE + " REAL NOT NULL," +
-                COL_ORDER_DATE + " INTEGER NOT NULL, " +
-                COL_ORDER_STATUS + " TEXT DEFAULT 'NEW', " +
-                "FOREIGN KEY(" + COL_ORDER_USER_ID + ") REFERENCES " + TABLE_USER + "(" + COL_USER_ID + "))");
-
-
-        // ------------------- ORDER ITEM -------------------
-        db.execSQL("CREATE TABLE " + TABLE_ORDER_ITEM + " (" +
-                COL_ORDER_ITEM_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                        COL_ORDER_ITEM_ORDER_ID + " INTEGER, " +
-                        COL_ORDER_ITEM_BOOK_ID + " INTEGER, " +
-                        COL_ORDER_ITEM_QUANTITY + " INTEGER, " +
-                        COL_ORDER_ITEM_PRICE + " REAL, " +
-                        "FOREIGN KEY(" + COL_ORDER_ITEM_ORDER_ID + ") REFERENCES " + TABLE_ORDER + "(" + COL_ORDER_ID + "), " +
-                        "FOREIGN KEY(" + COL_ORDER_ITEM_BOOK_ID + ") REFERENCES " + TABLE_BOOK + "(" + COL_BOOK_ID + "))");
-
-        // ------------------- CART -------------------
         db.execSQL("CREATE TABLE " + TABLE_CART + " (" +
-                        COL_CART_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                        COL_CART_USER_ID + " INTEGER UNIQUE" +
-                        ")");
+                COL_CART_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                COL_CART_USER_ID + " INTEGER UNIQUE)");
 
-        // ------------------- CART_ITEM -------------------
         db.execSQL("CREATE TABLE " + TABLE_CART_ITEM + " (" +
                 COL_CART_ITEM_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 COL_CART_ITEM_CART_ID + " INTEGER, " +
@@ -163,14 +133,28 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 COL_CART_ITEM_TITLE + " TEXT, " +
                 COL_CART_ITEM_PRICE + " REAL, " +
                 COL_CART_ITEM_QUANTITY + " INTEGER, " +
-                COL_CART_ITEM_IMAGE + " TEXT, "+
-                "UNIQUE(" + COL_CART_ITEM_CART_ID + ", " + COL_CART_ITEM_BOOK_ID + "), " +
+                COL_CART_ITEM_IMAGE + " TEXT, " +
+                "UNIQUE(" + COL_CART_ITEM_CART_ID + "," + COL_CART_ITEM_BOOK_ID + "), " +
                 "FOREIGN KEY(" + COL_CART_ITEM_CART_ID + ") REFERENCES " + TABLE_CART + "(" + COL_CART_ID + ") ON DELETE CASCADE, " +
-                "FOREIGN KEY(" + COL_CART_ITEM_BOOK_ID + ") REFERENCES " + TABLE_BOOK + "(" + COL_BOOK_ID + ") ON DELETE CASCADE" +
-                ")");
+                "FOREIGN KEY(" + COL_CART_ITEM_BOOK_ID + ") REFERENCES " + TABLE_BOOK + "(" + COL_BOOK_ID + ") ON DELETE CASCADE)");
 
+        db.execSQL("CREATE TABLE " + TABLE_ORDER + " (" +
+                COL_ORDER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                COL_ORDER_USER_ID + " INTEGER, " +
+                COL_ORDER_TOTAL_PRICE + " REAL NOT NULL, " +
+                COL_ORDER_DATE + " INTEGER NOT NULL, " +
+                COL_ORDER_STATUS + " TEXT DEFAULT 'NEW', " +
+                "FOREIGN KEY(" + COL_ORDER_USER_ID + ") REFERENCES " + TABLE_USER + "(" + COL_USER_ID + "))");
 
-        // ------------------- REVIEW -------------------
+        db.execSQL("CREATE TABLE " + TABLE_ORDER_ITEM + " (" +
+                COL_ORDER_ITEM_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                COL_ORDER_ITEM_ORDER_ID + " INTEGER, " +
+                COL_ORDER_ITEM_BOOK_ID + " INTEGER, " +
+                COL_ORDER_ITEM_QUANTITY + " INTEGER, " +
+                COL_ORDER_ITEM_PRICE + " REAL, " +
+                "FOREIGN KEY(" + COL_ORDER_ITEM_ORDER_ID + ") REFERENCES " + TABLE_ORDER + "(" + COL_ORDER_ID + "), " +
+                "FOREIGN KEY(" + COL_ORDER_ITEM_BOOK_ID + ") REFERENCES " + TABLE_BOOK + "(" + COL_BOOK_ID + "))");
+
         db.execSQL("CREATE TABLE " + TABLE_REVIEW + " (" +
                 COL_REVIEW_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 COL_REVIEW_USER_ID + " INTEGER NOT NULL, " +
@@ -180,17 +164,44 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 COL_REVIEW_CREATED_AT + " TEXT DEFAULT CURRENT_TIMESTAMP, " +
                 "UNIQUE(" + COL_REVIEW_USER_ID + "," + COL_REVIEW_BOOK_ID + "), " +
                 "FOREIGN KEY(" + COL_REVIEW_USER_ID + ") REFERENCES " + TABLE_USER + "(" + COL_USER_ID + ") ON DELETE CASCADE, " +
-                "FOREIGN KEY(" + COL_REVIEW_BOOK_ID + ") REFERENCES " + TABLE_BOOK + "(" + COL_BOOK_ID + ") ON DELETE CASCADE" +
-                ")");
-
-        // ------------------- INDEX -------------------
-        db.execSQL("CREATE INDEX idx_review_book ON " + TABLE_REVIEW + "(" + COL_REVIEW_BOOK_ID + ")");
-        db.execSQL("CREATE INDEX idx_review_user ON " + TABLE_REVIEW + "(" + COL_REVIEW_USER_ID + ")");
+                "FOREIGN KEY(" + COL_REVIEW_BOOK_ID + ") REFERENCES " + TABLE_BOOK + "(" + COL_BOOK_ID + ") ON DELETE CASCADE)");
 
         insertSampleData(db);
     }
 
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+
+        if (oldVersion < 21) {
+            migrateCart(db);
+        }
+    }
+
+    private void migrateCart(SQLiteDatabase db) {
+
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CART_ITEM);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CART);
+
+        db.execSQL("CREATE TABLE " + TABLE_CART + " (" +
+                COL_CART_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                COL_CART_USER_ID + " INTEGER UNIQUE)");
+
+        db.execSQL("CREATE TABLE " + TABLE_CART_ITEM + " (" +
+                COL_CART_ITEM_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                COL_CART_ITEM_CART_ID + " INTEGER, " +
+                COL_CART_ITEM_BOOK_ID + " INTEGER, " +
+                COL_CART_ITEM_TITLE + " TEXT, " +
+                COL_CART_ITEM_PRICE + " REAL, " +
+                COL_CART_ITEM_QUANTITY + " INTEGER, " +
+                COL_CART_ITEM_IMAGE + " TEXT, " +
+                "UNIQUE(" + COL_CART_ITEM_CART_ID + "," + COL_CART_ITEM_BOOK_ID + "), " +
+                "FOREIGN KEY(" + COL_CART_ITEM_CART_ID + ") REFERENCES " + TABLE_CART + "(" + COL_CART_ID + ") ON DELETE CASCADE, " +
+                "FOREIGN KEY(" + COL_CART_ITEM_BOOK_ID + ") REFERENCES " + TABLE_BOOK + "(" + COL_BOOK_ID + ") ON DELETE CASCADE)");
+    }
+
+
     private void insertSampleData(SQLiteDatabase db) {
+
         long now = System.currentTimeMillis();
 
         db.execSQL("INSERT INTO " + TABLE_CATEGORY + "(" + COL_CATEGORY_NAME + ") VALUES ('Lập trình')");
@@ -205,7 +216,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 COL_TITLE + "," + COL_AUTHOR + "," + COL_PRICE + "," + COL_CATEGORY_ID_BOOK + "," + COL_STOCK +
                 ") VALUES ('Android','Trần Văn B',150000,1,40)");
 
-
         db.execSQL("INSERT INTO " + TABLE_USER + "(" +
                 COL_EMAIL + "," + COL_PASSWORD + "," + COL_FULL_NAME + "," + COL_ROLE + "," + COL_CREATED_AT +
                 ") VALUES ('admin@gmail.com','123','Admin','admin'," + now + ")");
@@ -213,48 +223,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("INSERT INTO " + TABLE_USER + "(" +
                 COL_EMAIL + "," + COL_PASSWORD + "," + COL_FULL_NAME + "," + COL_ROLE + "," + COL_CREATED_AT +
                 ") VALUES ('user@gmail.com','123','User','user'," + now + ")");
-        db.execSQL("INSERT INTO " + TABLE_CART + " (" + COL_CART_USER_ID + ") VALUES (1)");
-        db.execSQL("INSERT INTO " + TABLE_CART + " (" + COL_CART_USER_ID + ") VALUES (2)");
 
-        db.execSQL("INSERT INTO " + TABLE_ORDER + "(" +
-                COL_ORDER_USER_ID + "," + COL_ORDER_DATE + "," + COL_ORDER_TOTAL_PRICE + "," +
-                COL_ORDER_STATUS + ") VALUES (1, " + now + ", 150000, 'TESTING')");
+        db.execSQL("INSERT OR IGNORE INTO " + TABLE_CART + " (" +
+                COL_CART_USER_ID + ") VALUES (1)");
 
-        db.execSQL("INSERT INTO " + TABLE_ORDER_ITEM + "(" +
-                COL_ORDER_ITEM_ORDER_ID + "," + COL_ORDER_ITEM_BOOK_ID + "," +
-                COL_ORDER_ITEM_QUANTITY + "," + COL_ORDER_ITEM_PRICE
-                + ") VALUES (1,1,2,120000)");
-    }
-
-    @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
-        if (oldVersion < 14) {
-            if (!isColumnExists(db, TABLE_BOOK, COL_RATING)) {
-                db.execSQL("ALTER TABLE " + TABLE_BOOK + " ADD COLUMN " + COL_RATING + " REAL DEFAULT 0");
-            }
-        }
-
-        if (oldVersion < 15) {
-            db.execSQL("DROP TABLE IF EXISTS " + TABLE_REVIEW);
-            db.execSQL("CREATE TABLE " + TABLE_REVIEW + " (" +
-                    COL_REVIEW_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    COL_REVIEW_USER_ID + " INTEGER NOT NULL, " +
-                    COL_REVIEW_BOOK_ID + " INTEGER NOT NULL, " +
-                    COL_REVIEW_RATING + " REAL, " +
-                    COL_REVIEW_COMMENT + " TEXT, " +
-                    COL_REVIEW_CREATED_AT + " TEXT DEFAULT CURRENT_TIMESTAMP)");
-        }
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CART);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CART_ITEM);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_BOOK);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CATEGORY);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_ORDER_ITEM);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_ORDER);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_USER);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_REVIEW);
-
-        onCreate(db);
+        db.execSQL("INSERT OR IGNORE INTO " + TABLE_CART + " (" +
+                COL_CART_USER_ID + ") VALUES (2)");
     }
 
     private boolean isColumnExists(SQLiteDatabase db, String tableName, String columnName) {

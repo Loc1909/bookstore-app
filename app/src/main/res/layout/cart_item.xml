@@ -16,7 +16,8 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:padding="12dp">
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp">
 
         <CheckBox
             android:id="@+id/cbSelected"
@@ -72,14 +73,6 @@
                 android:layout_marginTop="10dp"
                 android:orientation="horizontal"
                 android:gravity="center_vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="SL:"
-                    android:textSize="14sp"
-                    android:textColor="@color/dark_espresso"
-                    android:layout_marginEnd="8dp"/>
 
                 <ImageView
                     android:id="@+id/btnMinus"
