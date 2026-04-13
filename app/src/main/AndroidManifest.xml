@@ -5,6 +5,7 @@
 
     <!-- Thêm quyền truy cập Internet để tải ảnh từ URL -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:allowBackup="true"
@@ -41,7 +42,23 @@
 
         <!-- Cart -->
         <activity android:name=".activities.CartActivity" android:exported="false"/>
-        <activity android:name=".activities.CheckoutActivity" android:exported="false"/>
+        <activity
+            android:name=".activities.CheckoutActivity"
+            android:exported="true"
+            android:label="Merchant Demo"
+            android:launchMode="singleTask">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="app"
+                    android:scheme="demozpdk" />
+            </intent-filter>
+
+        </activity>
         <activity android:name=".activities.BookDetailActivity" android:exported="false"/>
 
     </application>

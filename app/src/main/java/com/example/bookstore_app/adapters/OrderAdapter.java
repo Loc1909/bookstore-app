@@ -74,6 +74,12 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.ViewHolder> 
         holder.tvEstimateDate.setText("Dự kiến giao hàng: " +
                 sdf2.format(new Date(order.getOrderDate() + 4 * 24 * 60 * 60 * 1000)));
 
+        String paymentMethod = order.getPaymentMethod();
+        if (paymentMethod == null || paymentMethod.isEmpty()) {
+            paymentMethod = "COD";
+        }
+        holder.tvPaymentMethod.setText("Thanh toán: " + paymentMethod);
+
         List<OrderItem> items = orderDAO.getOrderItemsByOrderId(order.getId());
         StringBuilder details = new StringBuilder();
         for (OrderItem item : items) {
@@ -104,7 +110,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.ViewHolder> 
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView tvStatus, tvTotalPrice, tvDate, tvEstimateDate, tvOrderDetails;
+        TextView tvStatus, tvTotalPrice, tvDate, tvEstimateDate, tvOrderDetails, tvPaymentMethod;
         Button btnCancel;
 
         public ViewHolder(@NonNull View itemView) {
@@ -114,6 +120,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.ViewHolder> 
             tvDate = itemView.findViewById(R.id.tvOrderDate);
             tvEstimateDate = itemView.findViewById(R.id.tvEstimateDate);
             tvOrderDetails = itemView.findViewById(R.id.tvOrderDetails);
+            tvPaymentMethod = itemView.findViewById(R.id.tvOrderPaymentMethod);
             btnCancel = itemView.findViewById(R.id.btnCancelOrder);
         }
     }

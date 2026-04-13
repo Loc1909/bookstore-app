@@ -20,7 +20,7 @@ public class OrderDAO {
         dbHelper = new DatabaseHelper(context);
     }
 
-    public long createOrder(int userId, List<CartItem> cartList, double totalPrice) {
+    public long createOrder(int userId, List<CartItem> cartList, double totalPrice, String paymentMethod) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         long orderId = -1;
 
@@ -31,6 +31,7 @@ public class OrderDAO {
             orderValues.put("order_date", System.currentTimeMillis());
             orderValues.put("total_price", totalPrice);
             orderValues.put("status", "PENDING");
+            orderValues.put("payment_method", paymentMethod);
 
             orderId = db.insert("orders", null, orderValues);
             for (CartItem item : cartList) {
@@ -68,6 +69,7 @@ public class OrderDAO {
                 order.setTotalPrice(cursor.getDouble(cursor.getColumnIndexOrThrow("total_price")));
                 order.setOrderDate(cursor.getLong(cursor.getColumnIndexOrThrow("order_date")));
                 order.setStatus(cursor.getString(cursor.getColumnIndexOrThrow("status")));
+                order.setPaymentMethod(cursor.getString(cursor.getColumnIndexOrThrow("payment_method")));
                 list.add(order);
             } while (cursor.moveToNext());
         }
@@ -102,6 +104,7 @@ public class OrderDAO {
                 order.setTotalPrice(cursor.getDouble(cursor.getColumnIndexOrThrow("total_price")));
                 order.setOrderDate(cursor.getLong(cursor.getColumnIndexOrThrow("order_date")));
                 order.setStatus(cursor.getString(cursor.getColumnIndexOrThrow("status")));
+                order.setPaymentMethod(cursor.getString(cursor.getColumnIndexOrThrow("payment_method")));
                 list.add(order);
             } while (cursor.moveToNext());
         }
@@ -131,6 +134,7 @@ public class OrderDAO {
                 order.setTotalPrice(cursor.getDouble(cursor.getColumnIndexOrThrow("total_price")));
                 order.setOrderDate(cursor.getLong(cursor.getColumnIndexOrThrow("order_date")));
                 order.setStatus(cursor.getString(cursor.getColumnIndexOrThrow("status")));
+                order.setPaymentMethod(cursor.getString(cursor.getColumnIndexOrThrow("payment_method")));
 
                 list.add(order);
             } while (cursor.moveToNext());
@@ -179,6 +183,7 @@ public class OrderDAO {
                 order.setTotalPrice(cursor.getDouble(cursor.getColumnIndexOrThrow("total_price")));
                 order.setOrderDate(cursor.getLong(cursor.getColumnIndexOrThrow("order_date")));
                 order.setStatus(cursor.getString(cursor.getColumnIndexOrThrow("status")));
+                order.setPaymentMethod(cursor.getString(cursor.getColumnIndexOrThrow("payment_method")));
                 list.add(order);
             } while (cursor.moveToNext());
         }
@@ -205,6 +210,7 @@ public class OrderDAO {
             order.setTotalPrice(cursor.getDouble(cursor.getColumnIndexOrThrow("total_price")));
             order.setOrderDate(cursor.getLong(cursor.getColumnIndexOrThrow("order_date")));
             order.setStatus(cursor.getString(cursor.getColumnIndexOrThrow("status")));
+            order.setPaymentMethod(cursor.getString(cursor.getColumnIndexOrThrow("payment_method")));
         }
 
         cursor.close();

@@ -66,6 +66,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COL_ORDER_DATE = "order_date";
     public static final String COL_ORDER_STATUS = "status";
 
+    public static final String COL_ORDER_PAYMENT_METHOD = "payment_method";
+
     // ---------------- ORDER ITEM ----------------
     public static final String COL_ORDER_ITEM_ID = "id";
     public static final String COL_ORDER_ITEM_ORDER_ID = "order_id";
@@ -144,6 +146,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 COL_ORDER_TOTAL_PRICE + " REAL NOT NULL, " +
                 COL_ORDER_DATE + " INTEGER NOT NULL, " +
                 COL_ORDER_STATUS + " TEXT DEFAULT 'NEW', " +
+                COL_ORDER_PAYMENT_METHOD + " TEXT DEFAULT 'COD', " +
                 "FOREIGN KEY(" + COL_ORDER_USER_ID + ") REFERENCES " + TABLE_USER + "(" + COL_USER_ID + "))");
 
         db.execSQL("CREATE TABLE " + TABLE_ORDER_ITEM + " (" +

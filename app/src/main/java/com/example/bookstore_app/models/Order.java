@@ -6,6 +6,7 @@ public class Order {
     private long orderDate; // yyyy-MM-dd
     private double totalPrice;
     private String status;
+    private String paymentMethod;
 
     public Order() {}
     public Order(int id, int userId, long orderDate, String status, double totalPrice) {
@@ -14,6 +15,14 @@ public class Order {
         this.orderDate = orderDate;
         this.totalPrice = totalPrice;
         this.status = status;
+    }
+    public Order(int id, int userId, long orderDate, String status, double totalPrice, String paymentMethod) {
+        this.id = id;
+        this.userId = userId;
+        this.orderDate = orderDate;
+        this.totalPrice = totalPrice;
+        this.status = status;
+        this.paymentMethod = paymentMethod;
     }
 
     public int getId() { return id; }
@@ -32,5 +41,13 @@ public class Order {
     }
     public void setTotalPrice(double totalPrice) {
         this.totalPrice = totalPrice;
+    }
+
+    public String getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(String paymentMethod) {
+        this.paymentMethod = paymentMethod;
     }
 }

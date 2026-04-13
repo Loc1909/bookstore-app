@@ -100,6 +100,30 @@
                 android:textSize="13sp"/>
         </LinearLayout>
 
+        <!-- PAYMENT METHOD -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/payments_24px"
+                app:tint="@color/dark_espresso_light"/>
+
+            <TextView
+                android:id="@+id/tvOrderPaymentMethod"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="Thanh toán: COD"
+                android:textColor="@color/dark_espresso_light"
+                android:textSize="13sp"/>
+        </LinearLayout>
+
         <!-- DIVIDER -->
         <View
             android:layout_width="match_parent"
