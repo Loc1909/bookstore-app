@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
@@ -20,13 +21,16 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.List;
+import android.text.Editable;
+import android.text.TextWatcher;
 
 public class AdminCategoryActivity extends AppCompatActivity {
 
     private RecyclerView rvCategories;
     private FloatingActionButton fabAddCategory;
-    private CategoryAdapter adapter;
     private List<Category> categoryList;
+    private CategoryAdapter adapter;
+    private List<Category> fullCategoryList;
     private CategoryDAO categoryDAO;
 
     @Override
@@ -34,25 +38,31 @@ public class AdminCategoryActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin_category);
 
-        Toolbar toolbar = findViewById(R.id.toolbarCategory);
-        setSupportActionBar(toolbar);
+        TextView tvCategoryCount = findViewById(R.id.tvCategoryCount);
+        View btnBack = findViewById(R.id.btnBack);
 
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        }
-
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        btnBack.setOnClickListener(v -> finish());
 
         rvCategories = findViewById(R.id.rvCategories);
         fabAddCategory = findViewById(R.id.fabAddCategory);
 
         categoryDAO = new CategoryDAO(this);
         categoryList = new ArrayList<>();
+        fullCategoryList = new ArrayList<>();
+
+        EditText etSearchCategory = findViewById(R.id.etSearchCategory);
+        etSearchCategory.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                filterCategories(s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
 
         adapter = new CategoryAdapter(categoryList, new CategoryAdapter.OnCategoryClickListener() {
             @Override
@@ -89,13 +99,32 @@ public class AdminCategoryActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        categoryList.clear();
-                        categoryList.addAll(data);
-                        adapter.notifyDataSetChanged();
+                        fullCategoryList.clear();
+                        fullCategoryList.addAll(data);
+                        
+                        // Apply current filter if any
+                        EditText etSearchCategory = findViewById(R.id.etSearchCategory);
+                        filterCategories(etSearchCategory.getText().toString());
                     }
                 });
             }
         }).start();
+    }
+
+    private void filterCategories(String query) {
+        categoryList.clear();
+        if (query.isEmpty()) {
+            categoryList.addAll(fullCategoryList);
+        } else {
+            String lowerQuery = query.toLowerCase().trim();
+            for (Category cat : fullCategoryList) {
+                if (cat.getName().toLowerCase().contains(lowerQuery)) {
+                    categoryList.add(cat);
+                }
+            }
+        }
+        adapter.notifyDataSetChanged();
+        ((TextView) findViewById(R.id.tvCategoryCount)).setText(String.valueOf(categoryList.size()));
     }
 
     // ================= ADD / EDIT =================
@@ -127,6 +156,11 @@ public class AdminCategoryActivity extends AppCompatActivity {
 
                 if (name.isEmpty()) {
                     etCategoryName.setError("Name cannot be empty");
+                    return;
+                }
+
+                if (name.length() < 2) {
+                    etCategoryName.setError("Name must be at least 2 characters long");
                     return;
                 }
 
