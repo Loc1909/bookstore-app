@@ -1,81 +1,158 @@
 <?xml version="1.0" encoding="utf-8"?>
 
+
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp"
     android:background="#F4F6FA">
 
-    <!-- ORDER INFO -->
-    <TextView
-        android:id="@+id/tvOrderId"
-        android:text="#ORD123"
-        android:textStyle="bold"
-        android:textSize="18sp"
-        android:textColor="#1A1A2E"
+    <!-- HEADER -->
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_width="wrap_content"/>
+        android:orientation="horizontal"
+        android:padding="12dp"
+        android:gravity="center_vertical"
+        android:background="#1A1A2E">
 
-    <TextView
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:id="@+id/tvStatus"
-        android:text="PENDING"
-        android:textSize="14sp"
-        android:layout_marginTop="4dp"/>
+        <ImageButton
+            android:id="@+id/btnBack"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:background="@drawable/bg_icon_circle_dark"
+            android:src="@drawable/arrow_back"
+            android:contentDescription="Back"
+            android:layout_marginEnd="12dp"
+            app:tint="#B0FFFFFF" />
 
-    <TextView
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:id="@+id/tvDate"
-        android:text="Ngày đặt"
-        android:layout_marginTop="4dp"/>
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Chi tiết đơn hàng"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"/>
 
-    <TextView
+        <TextView
+            android:id="@+id/tvOrderCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="#DETAIL"
+            android:textSize="12sp"
+            android:textColor="#185FA5"
+            android:background="@drawable/bg_badge_blue"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"/>
+    </LinearLayout>
+
+
+    <!-- ORDER CARD -->
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:id="@+id/tvTotal"
-        android:text="Tổng tiền"
-        android:textStyle="bold"
-        android:layout_marginTop="6dp"/>
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:background="#FFFFFF"
+        android:elevation="4dp">
+
+        <!-- ORDER ID -->
+        <TextView
+            android:id="@+id/tvOrderId"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="#ORD123"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:textColor="#1A1A2E" />
+
+        <!-- STATUS -->
+        <TextView
+            android:id="@+id/tvStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="PENDING"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:textColor="#FF9800"
+            android:layout_marginTop="6dp" />
+
+        <!-- DATE -->
+        <TextView
+            android:id="@+id/tvDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ngày đặt: 00/00/0000"
+            android:textSize="13sp"
+            android:textColor="#666"
+            android:layout_marginTop="4dp" />
+
+        <!-- TOTAL -->
+        <TextView
+            android:id="@+id/tvTotal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tổng tiền: 0đ"
+            android:textStyle="bold"
+            android:textSize="15sp"
+            android:textColor="#2E7D32"
+            android:layout_marginTop="8dp" />
+    </LinearLayout>
 
     <!-- DIVIDER -->
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="#DDD"
-        android:layout_marginVertical="10dp"/>
+        android:background="#E0E0E0"/>
+
+    <!-- ITEMS TITLE (UI ONLY) -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Sản phẩm trong đơn"
+        android:textStyle="bold"
+        android:padding="16dp"
+        android:textColor="#333"/>
 
     <!-- LIST ITEMS -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvItems"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"/>
+        android:layout_weight="1"
+        android:padding="16dp"/>
 
-    <!-- ACTION BUTTON -->
+    <!-- ACTION BUTTON AREA -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:gravity="end">
+        android:gravity="end"
+        android:layout_marginTop="12dp">
 
         <Button
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
             android:id="@+id/btnCancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:text="Hủy"
-            android:visibility="gone"/>
+            android:visibility="gone"
+            android:backgroundTint="#E53935"
+            android:textColor="#FFFFFF"/>
 
         <Button
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
             android:id="@+id/btnAction"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:text="Action"
             android:layout_marginStart="10dp"
-            android:visibility="gone"/>
+            android:visibility="gone"
+            android:backgroundTint="#1E88E5"
+            android:textColor="#FFFFFF"/>
     </LinearLayout>
 
 </LinearLayout>

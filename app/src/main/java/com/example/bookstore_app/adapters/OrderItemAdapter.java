@@ -44,8 +44,12 @@ public class OrderItemAdapter extends RecyclerView.Adapter<OrderItemAdapter.View
 
         public ViewHolder(View v) {
             super(v);
+
             title = v.findViewById(android.R.id.text1);
             subtitle = v.findViewById(android.R.id.text2);
+
+            title.setTextColor(android.graphics.Color.BLACK);
+            subtitle.setTextColor(android.graphics.Color.BLACK);
         }
     }
 }

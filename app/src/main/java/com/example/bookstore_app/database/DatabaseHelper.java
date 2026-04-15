@@ -8,7 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "bookstore.db";
-    private static final int DATABASE_VERSION = 21;
+    private static final int DATABASE_VERSION = 22;
 
     // ---------------- TABLE NAMES ----------------
     public static final String TABLE_BOOK = "books";
@@ -175,8 +175,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
-        if (oldVersion < 21) {
-            migrateCart(db);
+        if (oldVersion < 22) {
+            db.execSQL(
+                    "ALTER TABLE " + TABLE_ORDER +
+                            " ADD COLUMN " + COL_ORDER_PAYMENT_METHOD + " TEXT"
+            );
         }
     }
 
