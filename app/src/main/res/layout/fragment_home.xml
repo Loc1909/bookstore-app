@@ -98,7 +98,6 @@
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                app:cardBackgroundColor="@color/dark_espresso_light"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="2dp"
                 app:strokeColor="@color/dark_espresso_border"
@@ -108,14 +107,11 @@
                     android:id="@+id/searchView"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-
                     android:iconifiedByDefault="false"
                     android:queryHint="Tìm kiếm sách, tác giả..."
-
                     android:background="@android:color/transparent"
                     android:paddingStart="8dp"
                     android:paddingEnd="8dp"
-
                     app:iconifiedByDefault="false"/>
             </com.google.android.material.card.MaterialCardView>
         </LinearLayout>

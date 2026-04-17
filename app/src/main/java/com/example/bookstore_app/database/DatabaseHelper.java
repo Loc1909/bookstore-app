@@ -8,7 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "bookstore.db";
-    private static final int DATABASE_VERSION = 22;
+    private static final int DATABASE_VERSION = 25;
 
     // ---------------- TABLE NAMES ----------------
     public static final String TABLE_BOOK = "books";
@@ -111,7 +111,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 COL_DESCRIPTION + " TEXT, " +
                 COL_STOCK + " INTEGER, " +
                 COL_RATING + " REAL DEFAULT 0, " +
-                "FOREIGN KEY(" + COL_CATEGORY_ID_BOOK + ") REFERENCES " + TABLE_CATEGORY + "(" + COL_CATEGORY_ID + "))");
+                "FOREIGN KEY(" + COL_CATEGORY_ID_BOOK + ") REFERENCES "
+                + TABLE_CATEGORY + "(" + COL_CATEGORY_ID + ") ON DELETE CASCADE" +
+                ")");
+
 
         db.execSQL("CREATE TABLE " + TABLE_USER + " (" +
                 COL_USER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -147,7 +150,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 COL_ORDER_DATE + " INTEGER NOT NULL, " +
                 COL_ORDER_STATUS + " TEXT DEFAULT 'NEW', " +
                 COL_ORDER_PAYMENT_METHOD + " TEXT DEFAULT 'COD', " +
-                "FOREIGN KEY(" + COL_ORDER_USER_ID + ") REFERENCES " + TABLE_USER + "(" + COL_USER_ID + "))");
+                "FOREIGN KEY(" + COL_ORDER_USER_ID + ") REFERENCES " + TABLE_USER + "(" + COL_USER_ID + ") ON DELETE CASCADE)");
 
         db.execSQL("CREATE TABLE " + TABLE_ORDER_ITEM + " (" +
                 COL_ORDER_ITEM_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -155,8 +158,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 COL_ORDER_ITEM_BOOK_ID + " INTEGER, " +
                 COL_ORDER_ITEM_QUANTITY + " INTEGER, " +
                 COL_ORDER_ITEM_PRICE + " REAL, " +
-                "FOREIGN KEY(" + COL_ORDER_ITEM_ORDER_ID + ") REFERENCES " + TABLE_ORDER + "(" + COL_ORDER_ID + "), " +
-                "FOREIGN KEY(" + COL_ORDER_ITEM_BOOK_ID + ") REFERENCES " + TABLE_BOOK + "(" + COL_BOOK_ID + "))");
+                "FOREIGN KEY(" + COL_ORDER_ITEM_ORDER_ID + ") REFERENCES " + TABLE_ORDER + "(" + COL_ORDER_ID + ") ON DELETE CASCADE, " +
+                "FOREIGN KEY(" + COL_ORDER_ITEM_BOOK_ID + ") REFERENCES " + TABLE_BOOK + "(" + COL_BOOK_ID + ") ON DELETE CASCADE)");
 
         db.execSQL("CREATE TABLE " + TABLE_REVIEW + " (" +
                 COL_REVIEW_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -178,6 +181,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if (oldVersion < 22) {
             db.execSQL(
                     "ALTER TABLE " + TABLE_ORDER +
+
                             " ADD COLUMN " + COL_ORDER_PAYMENT_METHOD + " TEXT"
             );
         }
