@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_cream"
+    android:clickable="true">
+
+    <!-- ================= GUEST MODE ================= -->
+    <LinearLayout
+        android:id="@+id/guestLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="24dp">
+
+        <ImageView
+            android:layout_width="110dp"
+            android:layout_height="110dp"
+            android:src="@drawable/ic_launcher_foreground"
+            android:layout_marginBottom="20dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Welcome to BookStore"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:textColor="@color/dark_espresso"
+            android:layout_marginBottom="6dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Please login or register to continue"
+            android:textSize="14sp"
+            android:textColor="@color/dark_espresso_light"
+            android:layout_marginBottom="28dp"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnLogin"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:text="Login"
+            android:textColor="@color/cream_light"
+            app:backgroundTint="@color/dark_espresso"
+            app:cornerRadius="14dp"
+            android:layout_marginBottom="12dp"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnRegister"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:text="Register"
+            android:textColor="@color/dark_espresso"
+            app:backgroundTint="@color/gold_primary"
+            app:cornerRadius="14dp"/>
+
+    </LinearLayout>
+
+</FrameLayout>

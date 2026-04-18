@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="ic_bookstore_app_background">#FFFFFF</color>
+    <color name="dark_espresso">#1A1208</color>
+    <color name="dark_espresso_light">#2A1E0C</color>
+    <color name="dark_espresso_border">#3D2E14</color>
+    <color name="bg_cream">#FDFAF5</color>
+    <color name="cream_light">#F5E6C8</color>
+    <color name="gold_primary">#D4A843</color>
+    <color name="gold_muted">#8B7355</color>
+    <color name="text_hint_dark">#5C4A2A</color>
+    <color name="card_border">#EDE0C8</color>
+    <color name="red">#D32F2F</color>
+
+</resources>

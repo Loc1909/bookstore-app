@@ -1,0 +1,78 @@
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="16dp"
+    android:layout_marginVertical="6dp"
+    app:cardBackgroundColor="@android:color/white"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="0dp"
+    app:strokeColor="#E0E0E0"
+    app:strokeWidth="1dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:gravity="center_vertical">
+
+        <FrameLayout
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:background="@drawable/bg_icon_teal"
+            android:layout_marginEnd="12dp">
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/account_circle_24px"
+                android:layout_gravity="center"
+                app:tint="#0F6E56"/>
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvUserFullname"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Full Name"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#1A1A2E"/>
+
+            <TextView
+                android:id="@+id/tvEmailRole"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="email • Role"
+                android:textSize="12sp"
+                android:textColor="#888780"
+                android:layout_marginTop="2dp"/>
+        </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/btnEditUser"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@drawable/edit_24px"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            app:tint="#0F6E56"
+            android:padding="8dp"/>
+
+        <ImageButton
+            android:id="@+id/btnDeleteUser"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@drawable/delete_24px"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            app:tint="#E57373"
+            android:padding="8dp"
+            android:layout_marginStart="4dp"/>
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>
