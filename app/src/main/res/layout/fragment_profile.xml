@@ -8,7 +8,7 @@
     android:layout_height="match_parent"
     android:background="@color/bg_cream">
 
-    <!-- HEADER giống Home -->
+    <!-- HEADER -->
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -67,14 +67,28 @@
                 android:layout_marginTop="16dp"
                 android:layout_marginBottom="24dp">
 
-                <ImageView
-                    android:id="@+id/imgAvatar"
+                <FrameLayout
                     android:layout_width="100dp"
-                    android:layout_height="100dp"
-                    android:src="@drawable/ic_user"
-                    android:contentDescription="Avatar"
-                    android:padding="10dp"
-                    android:background="@null"/>
+                    android:layout_height="100dp">
+
+                    <ImageView
+                        android:id="@+id/imgAvatar"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/ic_user"
+                        android:scaleType="centerCrop"
+                        android:background="@drawable/bg_circle"
+                        android:clipToOutline="true"/>
+
+                    <ImageView
+                        android:id="@+id/btnChangeAvatar"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:layout_gravity="bottom|end"
+                        android:src="@drawable/ic_edit"
+                        android:background="@drawable/bg_circle_small"
+                        android:padding="6dp"/>
+                </FrameLayout>
 
                 <TextView
                     android:id="@+id/txtUserName"
@@ -183,6 +197,16 @@
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnEditProfile"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:textColor="@color/white"
+                android:text="Chỉnh sửa thông tin"
+                android:textAllCaps="false"
+                android:layout_marginTop="12dp"
+                app:cornerRadius="12dp"
+                app:backgroundTint="@color/gold_primary"/>
 
             <!-- ADMIN -->
             <com.google.android.material.card.MaterialCardView
@@ -191,6 +215,7 @@
                 android:layout_height="wrap_content"
                 android:visibility="gone"
                 android:layout_marginBottom="16dp"
+                android:layout_marginTop="16dp"
                 app:cardBackgroundColor="@color/dark_espresso_light"
                 app:cardCornerRadius="16dp">
 

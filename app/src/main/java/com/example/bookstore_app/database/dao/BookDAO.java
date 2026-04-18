@@ -19,31 +19,35 @@ public class BookDAO {
         dbHelper = new DatabaseHelper(context);
     }
 
-    // INSERT BOOK
+    // ================= INSERT =================
     public void insertBook(Book book){
 
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put("title", book.getTitle());
-        values.put("author", book.getAuthor());
-        values.put("price", book.getPrice());
-        values.put("imageUrl", book.getImageUrl());
-        values.put("category_id", book.getCategoryId());
-        values.put("description", book.getDescription());
-        values.put("stock", book.getStock());
+        values.put(DatabaseHelper.COL_TITLE, book.getTitle());
+        values.put(DatabaseHelper.COL_AUTHOR, book.getAuthor());
+        values.put(DatabaseHelper.COL_PRICE, book.getPrice());
+        values.put(DatabaseHelper.COL_IMAGE, book.getImageUrl());
+        values.put(DatabaseHelper.COL_CATEGORY_ID_BOOK, book.getCategoryId());
+        values.put(DatabaseHelper.COL_DESCRIPTION, book.getDescription());
+        values.put(DatabaseHelper.COL_STOCK, book.getStock());
+        values.put(DatabaseHelper.COL_RATING, book.getRating());
 
-        db.insert("books", null, values);
+        db.insert(DatabaseHelper.TABLE_BOOK, null, values);
         db.close();
     }
 
+    // ================= SEARCH =================
     public List<Book> searchBooks(String keyword, int limit, int offset){
 
         List<Book> list = new ArrayList<>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
         Cursor cursor = db.rawQuery(
-                "SELECT * FROM books WHERE title LIKE ? ORDER BY id DESC LIMIT ? OFFSET ?",
+                "SELECT * FROM " + DatabaseHelper.TABLE_BOOK +
+                        " WHERE " + DatabaseHelper.COL_TITLE + " LIKE ? " +
+                        "ORDER BY id DESC LIMIT ? OFFSET ?",
                 new String[]{
                         "%" + keyword + "%",
                         String.valueOf(limit),
@@ -53,17 +57,7 @@ public class BookDAO {
 
         if(cursor.moveToFirst()){
             do{
-                Book book = new Book(
-                        cursor.getInt(cursor.getColumnIndexOrThrow("id")),
-                        cursor.getString(cursor.getColumnIndexOrThrow("title")),
-                        cursor.getString(cursor.getColumnIndexOrThrow("author")),
-                        cursor.getInt(cursor.getColumnIndexOrThrow("category_id")),
-                        cursor.getDouble(cursor.getColumnIndexOrThrow("price")),
-                        cursor.getString(cursor.getColumnIndexOrThrow("description")),
-                        cursor.getString(cursor.getColumnIndexOrThrow("imageUrl")),
-                        cursor.getInt(cursor.getColumnIndexOrThrow("stock"))
-                );
-                list.add(book);
+                list.add(mapCursorToBook(cursor));
             } while(cursor.moveToNext());
         }
 
@@ -72,16 +66,15 @@ public class BookDAO {
         return list;
     }
 
-
-
+    // ================= PAGING =================
     public List<Book> getBooksPaging(int limit, int offset){
 
         List<Book> list = new ArrayList<>();
-
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
         Cursor cursor = db.rawQuery(
-                "SELECT * FROM books LIMIT ? OFFSET ?",
+                "SELECT * FROM " + DatabaseHelper.TABLE_BOOK +
+                        " LIMIT ? OFFSET ?",
                 new String[]{
                         String.valueOf(limit),
                         String.valueOf(offset)
@@ -90,63 +83,43 @@ public class BookDAO {
 
         if(cursor.moveToFirst()){
             do{
-                int id = cursor.getInt(cursor.getColumnIndexOrThrow("id"));
-                String title = cursor.getString(cursor.getColumnIndexOrThrow("title"));
-                String author = cursor.getString(cursor.getColumnIndexOrThrow("author"));
-                double price = cursor.getDouble(cursor.getColumnIndexOrThrow("price"));
-                String imageUrl = cursor.getString(cursor.getColumnIndexOrThrow("imageUrl"));
-                int categoryId = cursor.getInt(cursor.getColumnIndexOrThrow("category_id"));
-                String description = cursor.getString(cursor.getColumnIndexOrThrow("description"));
-                int stock = cursor.getInt(cursor.getColumnIndexOrThrow("stock"));
-
-                Book book = new Book(id, title, author, categoryId, price, description, imageUrl, stock);
-                list.add(book);
-
+                list.add(mapCursorToBook(cursor));
             } while(cursor.moveToNext());
         }
 
         cursor.close();
         db.close();
-
         return list;
     }
 
+    // ================= FILTER CATEGORY =================
     public List<Book> getBooksByCategory(int categoryId, String keyword, int limit, int offset){
 
         List<Book> list = new ArrayList<>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
-        StringBuilder sql = new StringBuilder("SELECT * FROM books WHERE category_id = ?");
-        List<String> argsList = new ArrayList<>();
+        StringBuilder sql = new StringBuilder(
+                "SELECT * FROM " + DatabaseHelper.TABLE_BOOK +
+                        " WHERE " + DatabaseHelper.COL_CATEGORY_ID_BOOK + " = ?"
+        );
 
-        argsList.add(String.valueOf(categoryId));
+        List<String> args = new ArrayList<>();
+        args.add(String.valueOf(categoryId));
 
-        // nếu có keyword thì thêm điều kiện
         if(keyword != null && !keyword.trim().isEmpty()){
-            sql.append(" AND title LIKE ?");
-            argsList.add("%" + keyword.trim() + "%");
+            sql.append(" AND ").append(DatabaseHelper.COL_TITLE).append(" LIKE ?");
+            args.add("%" + keyword.trim() + "%");
         }
 
         sql.append(" ORDER BY id DESC LIMIT ? OFFSET ?");
-        argsList.add(String.valueOf(limit));
-        argsList.add(String.valueOf(offset));
+        args.add(String.valueOf(limit));
+        args.add(String.valueOf(offset));
 
-        Cursor cursor = db.rawQuery(sql.toString(), argsList.toArray(new String[0]));
+        Cursor cursor = db.rawQuery(sql.toString(), args.toArray(new String[0]));
 
         if(cursor.moveToFirst()){
             do{
-                Book book = new Book(
-                        cursor.getInt(cursor.getColumnIndexOrThrow("id")),
-                        cursor.getString(cursor.getColumnIndexOrThrow("title")),
-                        cursor.getString(cursor.getColumnIndexOrThrow("author")),
-                        cursor.getInt(cursor.getColumnIndexOrThrow("category_id")),
-                        cursor.getDouble(cursor.getColumnIndexOrThrow("price")),
-                        cursor.getString(cursor.getColumnIndexOrThrow("description")),
-                        cursor.getString(cursor.getColumnIndexOrThrow("imageUrl")),
-                        cursor.getInt(cursor.getColumnIndexOrThrow("stock"))
-                );
-                list.add(book);
-
+                list.add(mapCursorToBook(cursor));
             }while(cursor.moveToNext());
         }
 
@@ -156,47 +129,34 @@ public class BookDAO {
         return list;
     }
 
-    // GET ALL BOOKS
+    // ================= GET ALL =================
     public List<Book> getAllBooks(){
 
         List<Book> list = new ArrayList<>();
-
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
-        Cursor cursor = db.rawQuery("SELECT * FROM books", null);
+        Cursor cursor = db.rawQuery("SELECT * FROM " + DatabaseHelper.TABLE_BOOK, null);
 
         if(cursor.moveToFirst()){
             do{
-
-                int id = cursor.getInt(cursor.getColumnIndexOrThrow("id"));
-                String title = cursor.getString(cursor.getColumnIndexOrThrow("title"));
-                String author = cursor.getString(cursor.getColumnIndexOrThrow("author"));
-                double price = cursor.getDouble(cursor.getColumnIndexOrThrow("price"));
-                String imageUrl = cursor.getString(cursor.getColumnIndexOrThrow("imageUrl"));
-                int categoryId = cursor.getInt(cursor.getColumnIndexOrThrow("category_id"));
-                String description = cursor.getString(cursor.getColumnIndexOrThrow("description"));
-                int stock = cursor.getInt(cursor.getColumnIndexOrThrow("stock"));
-
-                Book book = new Book(id, title, author, categoryId, price, description, imageUrl, stock);
-
-                list.add(book);
-
+                list.add(mapCursorToBook(cursor));
             }while(cursor.moveToNext());
         }
 
         cursor.close();
         db.close();
-
         return list;
     }
 
+    // ================= ADMIN SEARCH =================
     public List<Book> searchBooksAdmin(String keyword){
 
         List<Book> list = new ArrayList<>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
         Cursor cursor = db.rawQuery(
-                "SELECT * FROM books WHERE title LIKE ? OR author LIKE ?",
+                "SELECT * FROM " + DatabaseHelper.TABLE_BOOK +
+                        " WHERE title LIKE ? OR author LIKE ?",
                 new String[]{
                         "%" + keyword + "%",
                         "%" + keyword + "%"
@@ -205,19 +165,7 @@ public class BookDAO {
 
         if(cursor.moveToFirst()){
             do{
-                Book book = new Book();
-
-                book.setId(cursor.getInt(cursor.getColumnIndexOrThrow("id")));
-                book.setTitle(cursor.getString(cursor.getColumnIndexOrThrow("title")));
-                book.setAuthor(cursor.getString(cursor.getColumnIndexOrThrow("author")));
-                book.setCategoryId(cursor.getInt(cursor.getColumnIndexOrThrow("category_id")));
-                book.setPrice(cursor.getDouble(cursor.getColumnIndexOrThrow("price")));
-                book.setDescription(cursor.getString(cursor.getColumnIndexOrThrow("description")));
-                book.setImageUrl(cursor.getString(cursor.getColumnIndexOrThrow("imageUrl")));
-                book.setStock(cursor.getInt(cursor.getColumnIndexOrThrow("stock")));
-
-                list.add(book);
-
+                list.add(mapCursorToBook(cursor));
             } while(cursor.moveToNext());
         }
 
@@ -227,40 +175,30 @@ public class BookDAO {
         return list;
     }
 
-    // DELETE BOOK
+    // ================= DELETE =================
     public void deleteBook(int id){
 
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-
-        db.delete("books","id=?",new String[]{String.valueOf(id)});
-
+        db.delete(DatabaseHelper.TABLE_BOOK, "id=?", new String[]{String.valueOf(id)});
         db.close();
     }
 
+    // ================= GET BY ID =================
     public Book getBookById(int id) {
+
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Book book = null;
 
         Cursor cursor = db.query(
-                "books",                  // tên bảng
-                null,                     // tất cả cột
-                "id = ?",                 // điều kiện WHERE
-                new String[]{String.valueOf(id)}, // giá trị tham số
+                DatabaseHelper.TABLE_BOOK,
+                null,
+                "id = ?",
+                new String[]{String.valueOf(id)},
                 null, null, null
         );
 
-        if (cursor != null) {
-            if (cursor.moveToFirst()) {
-                book = new Book();
-                book.setId(cursor.getInt(cursor.getColumnIndexOrThrow("id")));
-                book.setTitle(cursor.getString(cursor.getColumnIndexOrThrow("title")));
-                book.setAuthor(cursor.getString(cursor.getColumnIndexOrThrow("author")));
-                book.setPrice(cursor.getDouble(cursor.getColumnIndexOrThrow("price")));
-                book.setImageUrl(cursor.getString(cursor.getColumnIndexOrThrow("imageUrl")));
-                book.setCategoryId(cursor.getInt(cursor.getColumnIndexOrThrow("category_id")));
-                book.setDescription(cursor.getString(cursor.getColumnIndexOrThrow("description")));
-                book.setStock(cursor.getInt(cursor.getColumnIndexOrThrow("stock")));
-            }
+        if(cursor != null && cursor.moveToFirst()){
+            book = mapCursorToBook(cursor);
             cursor.close();
         }
 
@@ -268,21 +206,80 @@ public class BookDAO {
         return book;
     }
 
-    // UPDATE BOOK
+    // ================= UPDATE =================
     public boolean updateBook(Book book){
 
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put("title", book.getTitle());
-        values.put("author", book.getAuthor());
-        values.put("price", book.getPrice());
-        values.put("imageUrl", book.getImageUrl());
-        values.put("category_id", book.getCategoryId());
-        values.put("description", book.getDescription());
-        values.put("stock", book.getStock());
+        values.put(DatabaseHelper.COL_TITLE, book.getTitle());
+        values.put(DatabaseHelper.COL_AUTHOR, book.getAuthor());
+        values.put(DatabaseHelper.COL_PRICE, book.getPrice());
+        values.put(DatabaseHelper.COL_IMAGE, book.getImageUrl());
+        values.put(DatabaseHelper.COL_CATEGORY_ID_BOOK, book.getCategoryId());
+        values.put(DatabaseHelper.COL_DESCRIPTION, book.getDescription());
+        values.put(DatabaseHelper.COL_STOCK, book.getStock());
+        values.put(DatabaseHelper.COL_RATING, book.getRating());
 
-        int rows = db.update("books", values, "id = ?", new String[]{String.valueOf(book.getId())});
+        int rows = db.update(
+                DatabaseHelper.TABLE_BOOK,
+                values,
+                "id = ?",
+                new String[]{String.valueOf(book.getId())}
+        );
+
+        db.close();
         return rows > 0;
     }
+
+    // ================= MAP CURSOR =================
+    private Book mapCursorToBook(Cursor cursor){
+
+        Book book = new Book();
+
+        book.setId(cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_BOOK_ID)));
+        book.setTitle(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_TITLE)));
+        book.setAuthor(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_AUTHOR)));
+        book.setCategoryId(cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_CATEGORY_ID_BOOK)));
+        book.setPrice(cursor.getDouble(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_PRICE)));
+        book.setDescription(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_DESCRIPTION)));
+        book.setImageUrl(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_IMAGE)));
+        book.setStock(cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_STOCK)));
+
+
+        if(cursor.getColumnIndex(DatabaseHelper.COL_RATING) != -1){
+            book.setRating(cursor.getFloat(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_RATING)));
+        }
+
+        return book;
+    }
+
+//    public Book getBookById(int bookId) {
+//        SQLiteDatabase db = dbHelper.getReadableDatabase();
+//        Book book = null;
+//
+//        Cursor cursor = db.rawQuery(
+//                "SELECT * FROM books WHERE id = ?",
+//                new String[]{String.valueOf(bookId)}
+//        );
+//
+//        if (cursor.moveToFirst()) {
+//
+//            int id = cursor.getInt(cursor.getColumnIndexOrThrow("id"));
+//            String title = cursor.getString(cursor.getColumnIndexOrThrow("title"));
+//            String author = cursor.getString(cursor.getColumnIndexOrThrow("author"));
+//            double price = cursor.getDouble(cursor.getColumnIndexOrThrow("price"));
+//            String description = cursor.getString(cursor.getColumnIndexOrThrow("description"));
+//            String image = cursor.getString(cursor.getColumnIndexOrThrow("imageUrl"));
+//            int stock = cursor.getInt(cursor.getColumnIndexOrThrow("stock"));
+//            int categoryId = cursor.getInt(cursor.getColumnIndexOrThrow("category_id"));
+//
+//            book = new Book(id, title, author, categoryId, price, description, image, stock);
+//        }
+//
+//        cursor.close();
+//        db.close();
+//
+//        return book;
+//    }
 }

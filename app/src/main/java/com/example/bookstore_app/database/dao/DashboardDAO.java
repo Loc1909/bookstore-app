@@ -63,10 +63,10 @@ public class DashboardDAO {
         return count;
     }
 
-    // nâng cao: đơn mới
+
     public int getNewOrders() {
         Cursor cursor = db.rawQuery(
-                "SELECT COUNT(*) FROM orders WHERE status = 'NEW'", null
+                "SELECT COUNT(*) FROM orders WHERE status = 'PENDING'", null
         );
 
         int count = 0;

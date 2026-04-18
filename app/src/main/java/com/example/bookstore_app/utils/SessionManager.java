@@ -18,6 +18,7 @@ public class SessionManager {
     private static final String KEY_USER_ID = "userId";
     private static final String KEY_USER_EMAIL = "userEmail";
     private static final String KEY_USER_NAME = "userName";
+    private static final String KEY_USER_AVATAR = "userAvatar";
 
     private SharedPreferences pref;
     private SharedPreferences.Editor editor;
@@ -31,9 +32,7 @@ public class SessionManager {
         this.gson = new Gson();
     }
 
-    /**
-     * Lưu session khi đăng nhập thành công
-     */
+    // ================= LOGIN =================
     public void saveLoginSession(User user) {
         editor.putBoolean(KEY_IS_LOGGED_IN, true);
         editor.putInt(KEY_USER_ID, user.getId());
@@ -41,84 +40,98 @@ public class SessionManager {
         editor.putString(KEY_USER_NAME, user.getFullName());
         editor.putString(KEY_USER_ROLE, user.getRole());
 
-        // Lưu toàn bộ object User dưới dạng JSON
+        // SAFE NULL
+        editor.putString(KEY_USER_AVATAR,
+                user.getAvatar() != null ? user.getAvatar() : "");
+
         String userJson = gson.toJson(user);
         editor.putString(KEY_USER_DATA, userJson);
 
         editor.apply();
     }
 
-    /**
-     * Xóa session khi đăng xuất
-     */
+    // ================= LOGOUT =================
     public void logout() {
         editor.clear();
         editor.apply();
     }
 
-    /**
-     * Kiểm tra đã đăng nhập chưa
-     */
+    // ================= CHECK LOGIN =================
     public boolean isLoggedIn() {
         return pref.getBoolean(KEY_IS_LOGGED_IN, false);
     }
 
-    /**
-     * Lấy toàn bộ thông tin User
-     */
+    // ================= GET USER (FULL SAFE) =================
     public User getUser() {
         String userJson = pref.getString(KEY_USER_DATA, null);
+
         if (userJson != null) {
-            Type type = new TypeToken<User>() {}.getType(); // ← Dòng 73 đã sửa
-            return gson.fromJson(userJson, type);
+            Type type = new TypeToken<User>() {}.getType();
+            User user = gson.fromJson(userJson, type);
+
+            if (user == null) return null;
+
+            if (user.getAvatar() == null || user.getAvatar().isEmpty()) {
+                user.setAvatar(pref.getString(KEY_USER_AVATAR, ""));
+            }
+
+            if (user.getPhone() == null) {
+                user.setPhone("");
+            }
+
+            if (user.getAddress() == null) {
+                user.setAddress("");
+            }
+
+            if (user.getRole() == null) {
+                user.setRole("user");
+            }
+
+            if (user.getFullName() == null) {
+                user.setFullName("");
+            }
+
+            if (user.getEmail() == null) {
+                user.setEmail("");
+            }
+
+            return user;
         }
         return null;
     }
 
-    /**
-     * Kiểm tra có phải admin không
-     */
+    // ================= ADMIN CHECK =================
     public boolean isAdmin() {
         String role = pref.getString(KEY_USER_ROLE, "user");
-        return "admin".equals(role);
+        return "admin".equalsIgnoreCase(role);
     }
 
-    /**
-     * Lấy User ID
-     */
+    // ================= GETTERS =================
     public int getUserId() {
         return pref.getInt(KEY_USER_ID, -1);
     }
 
-    /**
-     * Lấy User Email
-     */
     public String getUserEmail() {
-        return pref.getString(KEY_USER_EMAIL, null);
+        return pref.getString(KEY_USER_EMAIL, "");
     }
 
-    /**
-     * Lấy User Name
-     */
     public String getUserName() {
-        return pref.getString(KEY_USER_NAME, null);
+        return pref.getString(KEY_USER_NAME, "");
     }
 
-    /**
-     * Lấy User Role
-     */
     public String getUserRole() {
         return pref.getString(KEY_USER_ROLE, "user");
     }
 
-    /**
-     * Cập nhật thông tin user sau khi chỉnh sửa
-     */
+    // ================= UPDATE USER =================
     public void updateUserData(User user) {
         editor.putInt(KEY_USER_ID, user.getId());
         editor.putString(KEY_USER_EMAIL, user.getEmail());
         editor.putString(KEY_USER_NAME, user.getFullName());
         editor.putString(KEY_USER_ROLE, user.getRole());
+
+        editor.putString(KEY_USER_AVATAR,
+                user.getAvatar() != null ? user.getAvatar() : "");
 
         String userJson = gson.toJson(user);
         editor.putString(KEY_USER_DATA, userJson);

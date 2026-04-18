@@ -9,13 +9,17 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.bookstore_app.R;
 import com.example.bookstore_app.models.Book;
 
+import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class BookAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
@@ -31,10 +35,15 @@ public class BookAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private boolean isAdmin;
 
     public BookAdapter(List<Book> bookList, OnBookActionListener listener, boolean isAdmin, int layoutType) {
-        this.bookList = bookList;
+        this.bookList = (bookList != null) ? bookList : new ArrayList<>();
         this.listener = listener;
         this.isAdmin = isAdmin;
         this.layoutType = layoutType;
+    }
+    public BookAdapter(List<Book> bookList, OnBookActionListener listener, boolean isAdmin) {
+        this.bookList = (bookList != null) ? bookList : new ArrayList<>();
+        this.listener = listener;
+        this.isAdmin = isAdmin;
     }
 
     @Override
@@ -70,19 +79,21 @@ public class BookAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         Book book = bookList.get(position);
         BookViewHolder h = (BookViewHolder) holder;
 
+        if (book == null) return;
+
         h.txtTitle.setText(book.getTitle());
         h.txtAuthor.setText(book.getAuthor());
-        h.txtPrice.setText(book.getPrice() + "đ");
+        NumberFormat formatter = NumberFormat.getInstance(new Locale("vi", "VN"));
+        h.txtPrice.setText(formatter.format(book.getPrice()) + " đ");
 
-        if (book.getImageUrl() != null && !book.getImageUrl().isEmpty()) {
-            Glide.with(h.itemView.getContext())
-                    .load(book.getImageUrl())
-                    .placeholder(R.drawable.ic_launcher_background)
-                    .into(h.imgBook);
-        } else {
-            h.imgBook.setImageResource(R.drawable.ic_launcher_background);
-        }
+        // load ảnh an toàn
+        Glide.with(h.itemView.getContext())
+                .load(book.getImageUrl())
+                .placeholder(R.drawable.ic_launcher_background)
+                .error(R.drawable.ic_launcher_background)
+                .into(h.imgBook);
 
+        // ===== ROLE =====
         if (!isAdmin) {
             if (h.btnEditBook != null) h.btnEditBook.setVisibility(View.GONE);
             if (h.btnDeleteBook != null) h.btnDeleteBook.setVisibility(View.GONE);
@@ -91,6 +102,7 @@ public class BookAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             if (h.btnBuyNow != null) h.btnBuyNow.setVisibility(View.GONE);
         }
 
+        // ===== CLICK =====
         h.itemView.setOnClickListener(v -> {
             if (listener != null) listener.onBookClick(book);
         });
@@ -98,6 +110,12 @@ public class BookAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         if (h.btnAddToCart != null) {
             h.btnAddToCart.setOnClickListener(v -> {
                 if (listener != null) listener.onAddToCart(book);
+            });
+        }
+
+        if (h.btnBuyNow != null) {
+            h.btnBuyNow.setOnClickListener(v -> {
+                if (listener != null) listener.onBuyNow(book);
             });
         }
 
@@ -116,7 +134,7 @@ public class BookAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     @Override
     public int getItemCount() {
-        return bookList.size();
+        return bookList == null ? 0 : bookList.size();
     }
 
     // ===== VIEW HOLDER =====
@@ -147,18 +165,56 @@ public class BookAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
     }
 
+    // ===== INTERFACE =====
     public interface OnBookActionListener {
         void onBookClick(Book book);
         void onEdit(Book book);
         void onDelete(Book book);
         void onAddToCart(Book book);
+
+
+        void onBuyNow(Book book);
     }
 
+    // ===== UPDATE DATA (DIFFUTIL) =====
     public void updateData(List<Book> newList) {
+        if (newList == null) newList = new ArrayList<>();
+
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffCallback(this.bookList, newList));
         this.bookList.clear();
         this.bookList.addAll(newList);
-        notifyDataSetChanged();
+        diffResult.dispatchUpdatesTo(this);
     }
 
+    static class DiffCallback extends DiffUtil.Callback {
 
+        private final List<Book> oldList;
+        private final List<Book> newList;
+
+        public DiffCallback(List<Book> oldList, List<Book> newList) {
+            this.oldList = oldList;
+            this.newList = newList;
+        }
+
+        @Override
+        public int getOldListSize() {
+            return oldList.size();
+        }
+
+        @Override
+        public int getNewListSize() {
+            return newList.size();
+        }
+
+        @Override
+        public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+            return oldList.get(oldItemPosition).getId() ==
+                    newList.get(newItemPosition).getId();
+        }
+
+        @Override
+        public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+            return oldList.get(oldItemPosition).equals(newList.get(newItemPosition));
+        }
+    }
 }

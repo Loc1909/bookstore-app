@@ -1,0 +1,22 @@
+<resources>
+
+    <style name="RatingBarYellow">
+        <item name="colorControlNormal">#E0E0E0</item>
+        <item name="colorControlActivated">#FFC107</item>
+        <item name="colorControlHighlight">#FFC107</item>
+    </style>
+
+    <style name="CustomDialogTheme" parent="Theme.MaterialComponents.Dialog.Alert">
+
+
+        <item name="android:windowBackground">@android:color/transparent</item>
+
+        <item name="android:windowFrame">@null</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:windowMinWidthMajor">100%</item>
+        <item name="android:windowMinWidthMinor">100%</item>
+        <item name="android:windowNoTitle">true</item>
+    </style>
+
+
+</resources>
