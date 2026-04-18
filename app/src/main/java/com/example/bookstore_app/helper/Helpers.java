@@ -1,9 +1,9 @@
-package com.example.bookstore_app.Helper;
+package com.example.bookstore_app.helper;
 
 import android.annotation.SuppressLint;
 
 
-import com.example.bookstore_app.Helper.HMac.HMacUtil;
+import com.example.bookstore_app.helper.HMac.HMacUtil;
 
 import org.jetbrains.annotations.NotNull;
 import java.security.InvalidKeyException;

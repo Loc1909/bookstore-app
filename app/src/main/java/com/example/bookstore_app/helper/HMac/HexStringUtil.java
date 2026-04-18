@@ -1,4 +1,4 @@
-package com.example.bookstore_app.Helper.HMac;
+package com.example.bookstore_app.helper.HMac;
 
 import java.util.Locale;
 

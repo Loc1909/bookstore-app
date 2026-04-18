@@ -1,4 +1,4 @@
-package com.example.bookstore_app.Constant;
+package com.example.bookstore_app.constant;
 
 public class AppInfo {
     public static final int APP_ID = 2553;

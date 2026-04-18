@@ -1,8 +1,8 @@
-package com.example.bookstore_app.Api;
+package com.example.bookstore_app.api;
 
 
-import com.example.bookstore_app.Constant.AppInfo;
-import com.example.bookstore_app.Helper.Helpers;
+import com.example.bookstore_app.constant.AppInfo;
+import com.example.bookstore_app.helper.Helpers;
 
 import org.json.JSONObject;
 

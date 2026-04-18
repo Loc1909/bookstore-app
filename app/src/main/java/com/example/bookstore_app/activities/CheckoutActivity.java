@@ -13,7 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.bookstore_app.Api.CreateOrder;
+import com.example.bookstore_app.api.CreateOrder;
 import com.example.bookstore_app.R;
 import com.example.bookstore_app.adapters.CheckoutAdapter;
 import com.example.bookstore_app.database.dao.BookDAO;

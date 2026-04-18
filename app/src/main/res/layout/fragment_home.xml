@@ -108,7 +108,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:iconifiedByDefault="false"
-                    android:queryHint="Tìm kiếm sách, tác giả..."
+                    android:queryHint="Tìm kiếm sách"
                     android:background="@android:color/transparent"
                     android:paddingStart="8dp"
                     android:paddingEnd="8dp"
