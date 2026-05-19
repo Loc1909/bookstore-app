@@ -150,4 +150,26 @@ public class CartDAO {
                 , new String[]{String.valueOf(userId)});
         db.close();
     }
+
+    public int getCartItemCount(int cartId) {
+
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        Cursor cursor = db.rawQuery(
+                "SELECT SUM(quantity) FROM " + DatabaseHelper.TABLE_CART_ITEM +
+                        " WHERE " + DatabaseHelper.COL_CART_ITEM_CART_ID + " = ?",
+                new String[]{String.valueOf(cartId)}
+        );
+
+        int count = 0;
+
+        if (cursor.moveToFirst()) {
+            count = cursor.getInt(0);
+        }
+
+        cursor.close();
+        db.close();
+
+        return count;
+    }
 }

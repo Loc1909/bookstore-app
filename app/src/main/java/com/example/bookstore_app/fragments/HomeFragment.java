@@ -44,6 +44,7 @@ public class HomeFragment extends Fragment {
     private RecyclerView recyclerBooks, recyclerFeatured;
     private SearchView searchView;
     private ImageView ivCart;
+    private TextView tvCartBadge;
     private TextView txtGreeting;
     private ChipGroup chipGroupCategories;
     private BookAdapter adapterBooks, adapterFeatured;
@@ -79,6 +80,7 @@ public class HomeFragment extends Fragment {
         recyclerFeatured = view.findViewById(R.id.recyclerFeatured);
         searchView = view.findViewById(R.id.searchView);
         ivCart = view.findViewById(R.id.ivCart);
+        tvCartBadge = view.findViewById(R.id.tvCartBadge);
         txtGreeting = view.findViewById(R.id.txtGreeting);
         sessionManager = new SessionManager(requireContext());
         currentUserId = sessionManager.getUserId();
@@ -104,6 +106,7 @@ public class HomeFragment extends Fragment {
         loadFirstBooks();
         loadFeatured();
         setupSearch();
+        updateCartBadge();
     }
 
     private String getGreeting() {
@@ -147,6 +150,7 @@ public class HomeFragment extends Fragment {
                         int cartId = cartDAO.getCartIdByUser(currentUserId);
                         cartDAO.addToCart(cartId, book, 1);
                         Toast.makeText(getContext(), "Đã thêm vào giỏ", Toast.LENGTH_SHORT).show();
+                        updateCartBadge();
                     }
                 },
                 false,
@@ -245,6 +249,7 @@ public class HomeFragment extends Fragment {
                         int cartId = cartDAO.getCartIdByUser(currentUserId);
                         cartDAO.addToCart(cartId, book, 1);
                         Toast.makeText(getContext(), "Đã thêm vào giỏ", Toast.LENGTH_SHORT).show();
+                        updateCartBadge();
                     }
                 },
                 false,
@@ -341,5 +346,19 @@ public class HomeFragment extends Fragment {
                 return true;
             }
         });
+    }
+
+    private void updateCartBadge() {
+
+        int cartId = cartDAO.getCartIdByUser(currentUserId);
+
+        int count = cartDAO.getCartItemCount(cartId);
+
+        if (count > 0) {
+            tvCartBadge.setVisibility(View.VISIBLE);
+            tvCartBadge.setText(String.valueOf(count));
+        } else {
+            tvCartBadge.setVisibility(View.GONE);
+        }
     }
 }
